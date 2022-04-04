@@ -1,5 +1,5 @@
 {
-  "name": "@template/core",
+  "name": "@essay/essay",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.ts",
@@ -8,6 +8,6 @@
   "license": "ISC",
   "devDependencies": {},
   "dependencies": {
-    "@template/core": "workspace:*"
+    "@essay/core": "workspace:*"
   }
 }
