@@ -1,4 +1,5 @@
-import { Mark, Node } from './nodes'
+import { Node } from './nodes'
+import { Mark } from './mark'
 
 interface ReslovedPath {
   node: Node
