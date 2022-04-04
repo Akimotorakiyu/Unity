@@ -17,14 +17,20 @@ importers:
       pretty-quick: 3.1.3_prettier@2.6.2
       typescript: 4.6.3
 
-  packages/essay/core:
-    specifiers: {}
-
   packages/essay/essay:
     specifiers:
-      '@essay/core': workspace:*
+      '@essay/model': workspace:*
     dependencies:
-      '@essay/core': link:../core
+      '@essay/model': link:../model
+
+  packages/essay/model:
+    specifiers:
+      '@essay/ordered-map': workspace:*
+    dependencies:
+      '@essay/ordered-map': link:../orderedMap
+
+  packages/essay/orderedMap:
+    specifiers: {}
 
   packages/example:
     specifiers:

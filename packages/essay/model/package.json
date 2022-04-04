@@ -1,5 +1,5 @@
 {
-  "name": "@essay/core",
+  "name": "@essay/model",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.ts",
@@ -7,5 +7,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "@essay/ordered-map": "workspace:*"
+  }
 }

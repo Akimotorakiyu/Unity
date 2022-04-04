@@ -8,6 +8,6 @@
   "license": "ISC",
   "devDependencies": {},
   "dependencies": {
-    "@essay/core": "workspace:*"
+    "@essay/model": "workspace:*"
   }
 }
