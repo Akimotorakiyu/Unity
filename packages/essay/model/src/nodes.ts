@@ -27,18 +27,3 @@ export class Node {
     return ReslovedPosition.resolve(this, pos)
   }
 }
-
-export class TextNode extends Node {
-  constructor(
-    public type: NodeType,
-    public props: Record<string, any>,
-    public textContent: string,
-    public marks: Mark[],
-  ) {
-    super(type, props, Fragment.empty, marks)
-  }
-
-  get size() {
-    return this.textContent.length
-  }
-}
