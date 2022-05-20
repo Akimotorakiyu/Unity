@@ -4,15 +4,12 @@ interface _ICaretPosition {
   getClientRect: DOMRect
 }
 
-export interface ICaret {
-  focusNode: Node
+export interface IDomCaret {
+  node: Node
   offset: number
 }
 
-export function _realCaretPositionFromPoint(
-  x: number,
-  y: number,
-): ICaret | null {
+export function _domCaretFromPoint(x: number, y: number): IDomCaret | null {
   let focusNode: Node
   let focusOffset: number
 

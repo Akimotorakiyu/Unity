@@ -1,2 +1,2 @@
-export * from './virtualBoard'
-export * from './virtualPen'
+export * from './_recoverDomSelection'
+export * from './_domCaretPositionFromPoint'
