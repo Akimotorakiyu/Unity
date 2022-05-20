@@ -1,4 +1,4 @@
-import { IDomCaret } from './_domCaretPositionFromPoint'
+import { IDomCaret } from './type'
 
 export function _recoverDomSelection(anchor: IDomCaret, focus: IDomCaret) {
   const selection = getSelection()

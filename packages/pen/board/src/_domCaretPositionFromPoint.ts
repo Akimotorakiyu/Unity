@@ -1,12 +1,8 @@
+import { IDomCaret } from './type'
 interface _ICaretPosition {
   offsetNode: Node
   offset: number
   getClientRect: DOMRect
-}
-
-export interface IDomCaret {
-  node: Node
-  offset: number
 }
 
 export function _domCaretFromPoint(x: number, y: number): IDomCaret | null {
