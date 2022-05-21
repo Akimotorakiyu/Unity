@@ -1,3 +1,4 @@
+import { genNanoDomId } from '@essay/nanoid'
 interface IViewCaret {
   mergedId: string
   offset: number
@@ -45,6 +46,37 @@ export class MergedIdController {
       throw new Error(
         `未找到 mergedId ${viewCaret.mergedId} 对应的 mergedIdList`,
       )
+    }
+  }
+
+  registeMergedDomNode(idList: string[]) {
+    idList.forEach((id) => {
+      if (this.idToMergedId.has(id)) {
+        throw new Error(
+          `id ${id} 已被 merge 至 mergedId${this.idToMergedId.get(id)}`,
+        )
+      }
+    })
+
+    const mergedId = genNanoDomId()
+    this.mergedIdtoIdList.set(mergedId, [...idList])
+    idList.forEach((id) => {
+      this.idToMergedId.set(id, mergedId)
+    })
+  }
+
+  unRegisteMergedDomNode(mergedId: string) {
+    const mergedIdList = this.mergedIdtoIdList.get(mergedId)
+    if (mergedIdList) {
+      mergedIdList.forEach((id) => {
+        if (this.idToMergedId.has(id)) {
+          this.idToMergedId.delete(id)
+        } else {
+          throw new Error(`未在 idToMergedId 找到 id ${id}`)
+        }
+      })
+    } else {
+      throw new Error(`未找到 mergedId ${mergedId} 对应的 mergedIdList`)
     }
   }
 }

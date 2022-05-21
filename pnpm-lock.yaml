@@ -1,4 +1,4 @@
-lockfileVersion: 5.3
+lockfileVersion: 5.4
 
 importers:
   .:
@@ -56,6 +56,30 @@ importers:
       vite: 2.9.1
       vite-plugin-windicss: 1.8.3_vite@2.9.1
       windicss: 3.5.1
+
+  packages/pen/board:
+    specifiers:
+      '@essay/model': workspace:*
+    dependencies:
+      '@essay/model': link:../../essay/model
+
+  packages/pen/pen:
+    specifiers:
+      '@essay/model': workspace:*
+    dependencies:
+      '@essay/model': link:../../essay/model
+
+  packages/share/nanoid:
+    specifiers:
+      nanoid: ^3.3.4
+    dependencies:
+      nanoid: 3.3.4
+
+  packages/vision/view:
+    specifiers:
+      '@essay/nanoid': workspace:*
+    dependencies:
+      '@essay/nanoid': link:../../share/nanoid
 
 packages:
   /@ampproject/remapping/2.1.2:
@@ -319,7 +343,6 @@ packages:
         integrity: sha512-hsEnFemeiW4D08A5gUAZxLBTXpZ39P+a+DGDsHw1yxqyQ/jzFEnxf5uTEGp+3bzAbNOxU1paTgYS4ECU/IgfDw==,
       }
     engines: { node: '>=6.9.0' }
-    dev: true
 
   /@babel/helper-validator-option/7.16.7:
     resolution:
@@ -362,6 +385,8 @@ packages:
       }
     engines: { node: '>=6.0.0' }
     hasBin: true
+    dependencies:
+      '@babel/types': 7.17.0
 
   /@babel/plugin-syntax-import-meta/7.10.4_@babel+core@7.17.8:
     resolution:
@@ -460,7 +485,6 @@ packages:
     dependencies:
       '@babel/helper-validator-identifier': 7.16.7
       to-fast-properties: 2.0.0
-    dev: true
 
   /@commitlint/cli/13.2.1:
     resolution:
@@ -555,7 +579,7 @@ packages:
       '@commitlint/execute-rule': 13.2.0
       '@commitlint/resolve-extends': 13.2.0
       '@commitlint/types': 13.2.0
-      '@endemolshinegroup/cosmiconfig-typescript-loader': 3.0.2_ec5c0ebd3030a0a5109338876648df1b
+      '@endemolshinegroup/cosmiconfig-typescript-loader': 3.0.2_5roa5pjqgcqkkeethcdwmsg7dm
       chalk: 4.1.2
       cosmiconfig: 7.0.1
       lodash: 4.17.21
@@ -651,7 +675,7 @@ packages:
       chalk: 4.1.2
     dev: true
 
-  /@endemolshinegroup/cosmiconfig-typescript-loader/3.0.2_ec5c0ebd3030a0a5109338876648df1b:
+  /@endemolshinegroup/cosmiconfig-typescript-loader/3.0.2_5roa5pjqgcqkkeethcdwmsg7dm:
     resolution:
       {
         integrity: sha512-QRVtqJuS1mcT56oHpVegkKBlgtWjXw/gHNWO3eL9oyB5Sc7HBoc2OLG/nYpVfT/Jejvo3NUrD0Udk7XgoyDKkA==,
@@ -2416,6 +2440,15 @@ packages:
     engines: { node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1 }
     hasBin: true
 
+  /nanoid/3.3.4:
+    resolution:
+      {
+        integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==,
+      }
+    engines: { node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1 }
+    hasBin: true
+    dev: false
+
   /node-releases/2.0.2:
     resolution:
       {
@@ -3072,7 +3105,6 @@ packages:
         integrity: sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog==,
       }
     engines: { node: '>=4' }
-    dev: true
 
   /to-regex-range/5.0.1:
     resolution:
