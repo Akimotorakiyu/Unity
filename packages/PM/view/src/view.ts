@@ -1,11 +1,14 @@
 import { Schema } from 'prosemirror-model'
 import { EditorState, Transaction } from 'prosemirror-state'
 import { EditorEvent } from './event'
+import { addUniqueMark } from './schema'
+
 export class EditorController<S extends Schema> {
   event: EditorEvent = new EditorEvent()
   constructor(public state: EditorState<S>) {}
 
   dispatch(tr: Transaction) {
+    addUniqueMark(tr)
     const newState = this.state.apply(tr)
     this.update(newState, tr)
   }

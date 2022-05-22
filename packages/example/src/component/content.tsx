@@ -3,7 +3,7 @@ import {
   contentNodeComponentMap,
   genComponentName,
 } from './contentNodeComponentMap'
-import { IJSONNode } from '@essay/pm-view'
+import { getIdFormNode, IJSONNode } from '@essay/pm-view'
 
 export const ContentComponent = defineFunctionComponent(
   (props: { node: IJSONNode<any, any> }) => {
@@ -33,13 +33,9 @@ export const FragmentContentComponent = defineFunctionComponent(
         return (
           <>
             {props.fragment?.map((node) => {
-              console.log('key', node.attrs.id)
-              return (
-                <ContentComponent
-                  node={node}
-                  key={node.attrs.id}
-                ></ContentComponent>
-              )
+              const key = getIdFormNode(node)
+
+              return <ContentComponent node={node} key={key}></ContentComponent>
             })}
           </>
         )
