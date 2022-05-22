@@ -1,16 +1,20 @@
 import { Schema } from 'prosemirror-model'
 import { EditorState, Transaction } from 'prosemirror-state'
-
+import { EditorEvent } from './event'
 export class EEditorView<S extends Schema> {
+  event: EditorEvent = new EditorEvent()
   constructor(public dom: HTMLDivElement, public state: EditorState<S>) {}
 
   dispatch(tr: Transaction) {
     const newState = this.state.apply(tr)
-    this.update(newState)
+    this.update(newState, tr)
   }
 
-  update(newState: EditorState<S>) {
+  update(newState: EditorState<S>, tr?: Transaction) {
+    const oldState = this.state
     this.state = newState
+
+    this.event.emit('state.update', newState, oldState, tr)
   }
 
   editable: boolean = true
