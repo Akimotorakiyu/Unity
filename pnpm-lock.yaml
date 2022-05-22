@@ -20,6 +20,7 @@ importers:
   packages/PM/view:
     specifiers:
       '@essay/event-proto': workspace:*
+      '@essay/nanoid': workspace:*
       '@types/prosemirror-commands': ^1.0.4
       '@types/prosemirror-history': ^1.0.3
       '@types/prosemirror-keymap': ^1.0.4
@@ -35,6 +36,7 @@ importers:
       prosemirror-transform: ^1.4.2
     dependencies:
       '@essay/event-proto': link:../../share/eventProto
+      '@essay/nanoid': link:../../share/nanoid
       prosemirror-commands: 1.2.2
       prosemirror-history: 1.2.0
       prosemirror-keymap: 1.1.5

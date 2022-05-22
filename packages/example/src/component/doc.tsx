@@ -8,7 +8,7 @@ export const DocNodeComponent = defineFunctionComponent(
     return {
       render: () => {
         return (
-          <div data-type={props.node.type}>
+          <div data-type={props.node.type} id={props.node.attrs.id}>
             <FragmentContentComponent
               fragment={props.node.content}
             ></FragmentContentComponent>

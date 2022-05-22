@@ -2,7 +2,11 @@ import { ref } from 'vue'
 import { ContentComponent } from './component'
 import { defineFunctionComponent } from './func/defineFunctionComponent'
 import { createEditor } from './pm/editor'
-import { EditorController, IJSONNode } from '@essay/pm-view'
+import {
+  attempSetIdForJSONDoc,
+  EditorController,
+  IJSONNode,
+} from '@essay/pm-view'
 
 function intsertText(editor: EditorController<any>) {
   const tr = editor.state.tr
@@ -20,12 +24,16 @@ function useTestTool(editor: EditorController<any>) {
 
 function useEditor() {
   const editor = createEditor()
+
+  attempSetIdForJSONDoc(editor.state.doc)
+
   const doc = ref<IJSONNode<any, any>>(
     editor.state.doc.toJSON() as IJSONNode<any, any>,
   )
 
   editor.event.on('state.update', (state) => {
     console.log('update', state.doc.toJSON())
+    attempSetIdForJSONDoc(editor.state.doc)
     doc.value = state.doc.toJSON() as IJSONNode<any, any>
   })
 

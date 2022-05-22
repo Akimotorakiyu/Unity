@@ -8,7 +8,11 @@ export const HeadingNodeComponent = defineFunctionComponent(
     return {
       render: () => {
         return (
-          <h1 data-type={props.node.type} data-level={props.node.attrs.level}>
+          <h1
+            data-type={props.node.type}
+            data-level={props.node.attrs.level}
+            id={props.node.attrs.id}
+          >
             <FragmentContentComponent
               fragment={props.node.content}
             ></FragmentContentComponent>

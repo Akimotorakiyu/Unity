@@ -4,7 +4,6 @@ import { keymap } from 'prosemirror-keymap'
 import { Schema } from 'prosemirror-model'
 import { EditorState } from 'prosemirror-state'
 import { history } from 'prosemirror-history'
-import { genNanoDomId } from '@essay/nanoid'
 export const mySchema = new Schema({
   nodes: {
     doc: {
@@ -24,12 +23,6 @@ export const mySchema = new Schema({
       parseDOM: [
         {
           tag: 'p',
-          getAttrs(node) {
-            console.log('node', node)
-            return {
-              id: genNanoDomId(),
-            }
-          },
         },
       ],
       toDOM() {

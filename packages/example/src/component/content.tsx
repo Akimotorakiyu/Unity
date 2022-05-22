@@ -33,10 +33,11 @@ export const FragmentContentComponent = defineFunctionComponent(
         return (
           <>
             {props.fragment?.map((node) => {
+              console.log('key', node.attrs.id)
               return (
                 <ContentComponent
                   node={node}
-                  key={Math.random()}
+                  key={node.attrs.id}
                 ></ContentComponent>
               )
             })}

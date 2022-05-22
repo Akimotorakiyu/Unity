@@ -8,7 +8,7 @@ export const PargraphNodeComponent = defineFunctionComponent(
     return {
       render: () => {
         return (
-          <p data-type={props.node.type}>
+          <p data-type={props.node.type} id={props.node.attrs.id}>
             <FragmentContentComponent
               fragment={props.node.content}
             ></FragmentContentComponent>
