@@ -68,6 +68,7 @@ importers:
   packages/example:
     specifiers:
       '@essay/essay': workspace:*
+      '@essay/nanoid': workspace:*
       '@essay/pm-view': workspace:*
       '@types/prosemirror-commands': ^1.0.4
       '@types/prosemirror-history': ^1.0.3
@@ -92,6 +93,7 @@ importers:
       windicss: ^3.5.1
     dependencies:
       '@essay/essay': link:../essay/essay
+      '@essay/nanoid': link:../share/nanoid
       '@essay/pm-view': link:../PM/view
       prosemirror-commands: 1.2.2
       prosemirror-history: 1.2.0

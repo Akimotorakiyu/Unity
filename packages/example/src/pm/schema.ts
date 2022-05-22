@@ -4,30 +4,34 @@ import { keymap } from 'prosemirror-keymap'
 import { Schema } from 'prosemirror-model'
 import { EditorState } from 'prosemirror-state'
 import { history } from 'prosemirror-history'
-
+import { genNanoDomId } from '@essay/nanoid'
 export const mySchema = new Schema({
   nodes: {
     doc: {
-      content: 'block math block+',
+      content: 'block+',
     },
-    heading: {
+    pargraph: {
+      group: 'block',
       attrs: {
-        id: {},
-        level: {
-          default: '1',
+        id: {
+          default: '',
         },
         align: {
           default: 'left',
         },
       },
-    },
-    pargraph: {
-      group: 'block',
-      attrs: {
-        id: {},
-      },
       content: 'text*',
-      parseDOM: [{ tag: 'p' }],
+      parseDOM: [
+        {
+          tag: 'p',
+          getAttrs(node) {
+            console.log('node', node)
+            return {
+              id: genNanoDomId(),
+            }
+          },
+        },
+      ],
       toDOM() {
         const p = document.createElement('p')
         return {
@@ -36,6 +40,20 @@ export const mySchema = new Schema({
         }
       },
     },
+    heading: {
+      attrs: {
+        id: {
+          default: '',
+        },
+        level: {
+          default: '1',
+        },
+        align: {
+          default: 'left',
+        },
+      },
+    },
+
     text: {},
   },
   marks: {
