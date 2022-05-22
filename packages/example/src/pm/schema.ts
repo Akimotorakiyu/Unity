@@ -12,6 +12,7 @@ export const mySchema = new Schema({
     },
     heading: {
       attrs: {
+        id: {},
         level: {
           default: '1',
         },
@@ -22,6 +23,9 @@ export const mySchema = new Schema({
     },
     pargraph: {
       group: 'block',
+      attrs: {
+        id: {},
+      },
       content: 'text*',
       parseDOM: [{ tag: 'p' }],
       toDOM() {
@@ -50,15 +54,19 @@ export const mySchema = new Schema({
 
 export const boldCommand = toggleMark(mySchema.marks.bold)
 
-const initState = EditorState.create({
-  schema: mySchema,
-  plugins: [
-    keymap(baseKeymap),
-    history(),
-    keymap({
-      'Mod-z': undo,
-      'Shift-Mod-z': redo,
-      'Mod-b': boldCommand,
-    }),
-  ],
-})
+export function createInitState() {
+  const initState = EditorState.create({
+    schema: mySchema,
+    plugins: [
+      keymap(baseKeymap),
+      history(),
+      keymap({
+        'Mod-z': undo,
+        'Shift-Mod-z': redo,
+        'Mod-b': boldCommand,
+      }),
+    ],
+  })
+
+  return initState
+}
