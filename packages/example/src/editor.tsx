@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { ContentComponent } from './component'
 import { defineFunctionComponent } from './func/defineFunctionComponent'
 import { createEditor } from './pm/editor'
@@ -52,14 +52,27 @@ export const Editor = defineFunctionComponent(() => {
   editor
   doc
 
+  onMounted(() => {
+    editor.event.emit('editor.onMounted')
+  })
+
   return {
     render: () => {
       console.log('doc', doc.value)
 
       return (
         <div>
-          editor
-          <ContentComponent node={doc.value}></ContentComponent>
+          <div>
+            <h1 class={` p-4 m-4 font-medium text-lg`}>Editor</h1>
+          </div>
+          <div
+            contenteditable
+            class={` shadow-md shadow-gray-400 m-4 rounded-md`}
+          >
+            <div contenteditable={false} class={` p-4`}>
+              <ContentComponent node={doc.value}></ContentComponent>
+            </div>
+          </div>
         </div>
       )
     },

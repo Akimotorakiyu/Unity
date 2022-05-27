@@ -24,6 +24,7 @@ type TEditorEvent = {
     oldState: EditorState,
     tr?: Transaction,
   ]
+  'editor.onMounted': []
 }
 
 export class EditorEvent extends EventPrototype<TEditorEvent> {}
