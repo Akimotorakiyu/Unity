@@ -1,15 +1,15 @@
 import { defineFunctionComponent } from '../func/defineFunctionComponent'
 import { IJSONNode } from '@essay/pm-view'
 import { genComponentName } from './contentNodeComponentMap'
-import { useTextDomRef } from './useDomRef'
-import { toRef } from 'vue'
+import { useDomRef } from './useDomRef'
+import { toRef, createVNode, Text } from 'vue'
 export const TextNodeComponent = defineFunctionComponent(
   (props: { node: IJSONNode<any, any> }, ctx) => {
-    const { domRef } = useTextDomRef(toRef(props, 'node'))
+    const { domRef } = useDomRef(toRef(props, 'node'))
 
     return {
       render: () => {
-        return <>{props.node.text}</>
+        return createVNode(Text, { ref: domRef }, props.node.text, 0)
       },
     }
   },

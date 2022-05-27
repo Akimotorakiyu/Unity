@@ -1,4 +1,4 @@
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { ContentComponent } from './component'
 import { defineFunctionComponent } from './func/defineFunctionComponent'
 import { createEditor } from './pm/editor'
@@ -23,7 +23,19 @@ function useTestTool(editor: EditorController<any>) {
 }
 
 function useEditor() {
+  const editorDomRef = ref<HTMLDivElement | null>(null)
   const editor = createEditor()
+
+  watch(
+    () => editorDomRef.value,
+    (dom) => {
+      if (dom) {
+        editor.init(dom)
+      } else {
+        editor.unInit()
+      }
+    },
+  )
 
   attempSetIdForJSONDoc(editor.state.doc)
 
@@ -32,7 +44,7 @@ function useEditor() {
   )
 
   editor.event.on('state.update', (state) => {
-    console.log('update', state.doc.toJSON())
+    console.log('update', state.doc.toJSON(), state.selection.toJSON())
     attempSetIdForJSONDoc(editor.state.doc)
     doc.value = state.doc.toJSON() as IJSONNode<any, any>
   })
@@ -44,11 +56,12 @@ function useEditor() {
   return {
     editor,
     doc,
+    editorDomRef,
   }
 }
 
 export const Editor = defineFunctionComponent(() => {
-  const { editor, doc } = useEditor()
+  const { editor, doc, editorDomRef } = useEditor()
   editor
   doc
 
@@ -69,7 +82,14 @@ export const Editor = defineFunctionComponent(() => {
             contenteditable
             class={` shadow-md shadow-gray-400 m-4 rounded-md`}
           >
-            <div contenteditable={false} class={` p-4`}>
+            <div
+              ref={editorDomRef}
+              contenteditable={false}
+              class={` p-4`}
+              tabindex="-1"
+              onClick={() => {}}
+              onPointerdown={() => {}}
+            >
               <ContentComponent node={doc.value}></ContentComponent>
             </div>
           </div>

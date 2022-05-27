@@ -1,11 +1,101 @@
-import { Schema } from 'prosemirror-model'
-import { EditorState, Transaction } from 'prosemirror-state'
+import { Node as PMNode, Schema } from 'prosemirror-model'
+import { EditorState, TextSelection, Transaction } from 'prosemirror-state'
+import { getEditorNodeByDomNode } from './const'
 import { EditorEvent } from './event'
+import { getIdFormNode, IJSONNode } from './jsonNode'
 import { addUniqueMark } from './schema'
+import { pointToRange } from './util'
+
+class EditorPoint {
+  constructor(public readonly x: number, public readonly y: number) {
+    this.domRange = pointToRange(this.x, this.y)
+  }
+
+  domRange: Range | null = null
+
+  get domNode() {
+    return this.domRange ? this.domRange.startContainer : null
+  }
+
+  get editorNode() {
+    return this.domNode ? getEditorNodeByDomNode(this.domNode) : null
+  }
+
+  get domOffset() {
+    return this.domRange ? this.domRange.startOffset : null
+  }
+}
+
+function findNodeById(id: string, doc: PMNode) {
+  let resNode: PMNode | null = null
+  let resPos = 0
+
+  doc.nodesBetween(0, doc.nodeSize - 2, (node, pos) => {
+    if (getIdFormNode(node.toJSON() as IJSONNode<any, any>) === id) {
+      resNode = node
+      resPos = pos
+    }
+  })
+
+  if (resNode) {
+    return {
+      node: resNode as PMNode,
+      pos: resPos,
+    }
+  } else {
+    return null
+  }
+}
 
 export class EditorController<S extends Schema> {
-  event: EditorEvent = new EditorEvent()
+  readonly event: EditorEvent = new EditorEvent()
   constructor(public state: EditorState<S>) {}
+  dom: HTMLDivElement | null = null
+
+  init(dom: HTMLDivElement) {
+    dom.addEventListener('click', this.onClick)
+    dom.addEventListener('pointerdown', this.onPointerDown)
+    this.dom = dom
+  }
+
+  readonly onClick = (event: MouseEvent) => {
+    console.log('event', event)
+    this.dealSelection(new EditorPoint(event.x, event.y))
+  }
+
+  dealSelection(point: EditorPoint) {
+    if (point.domRange) {
+      const node = point.editorNode!
+      const id = getIdFormNode(node)
+
+      const res = findNodeById(id, this.state.doc)
+      console.log('set selection', id, res)
+
+      if (res) {
+        const tr = this.state.tr
+        tr.setSelection(
+          new TextSelection(
+            this.state.doc.resolve(res.pos),
+            this.state.doc.resolve(res.pos),
+          ),
+        )
+        this.dispatch(tr)
+      }
+    }
+  }
+
+  readonly onPointerDown = (event: PointerEvent) => {}
+
+  unInit() {
+    if (this.dom) {
+      const dom = this.dom
+
+      dom.removeEventListener('click', this.onClick)
+      dom.removeEventListener('pointerdown', this.onPointerDown)
+
+      this.dom = null
+    }
+  }
 
   dispatch(tr: Transaction) {
     addUniqueMark(tr)
@@ -35,13 +125,13 @@ export class EditorController<S extends Schema> {
   ): { left: number; right: number; top: number; bottom: number } {
     throw new Error('Method not implemented.')
   }
-  domAtPos(pos: number, side?: number): { node: Node; offset: number } {
+  domAtPos(pos: number, side?: number): { node: PMNode; offset: number } {
     throw new Error('Method not implemented.')
   }
-  nodeDOM(pos: number): Node | null | undefined {
+  nodeDOM(pos: number): PMNode | null | undefined {
     throw new Error('Method not implemented.')
   }
-  posAtDOM(node: Node, offset: number, bias?: number | null): number {
+  posAtDOM(node: PMNode, offset: number, bias?: number | null): number {
     throw new Error('Method not implemented.')
   }
   endOfTextblock(

@@ -1,37 +1,31 @@
 import { IJSONNode, DOM_TO_NODE_KEY } from '@essay/pm-view'
-import { getCurrentInstance, onMounted, onUpdated, Ref, ref, watch } from 'vue'
+import { Ref, ref, watch } from 'vue'
 
-export function useDomRef<N extends Node>(node: Ref<IJSONNode<any, any>>) {
+export function useDomRef<N extends Node>(
+  editorNode: Ref<IJSONNode<any, any>>,
+) {
   const domRef = ref<N | null>(null)
 
   watch(
-    () => [domRef.value, node.value],
-    ([domValue, nodeValue]) => {
-      if (domValue) {
-        Reflect.set(domValue, DOM_TO_NODE_KEY, nodeValue)
+    () => editorNode.value,
+    (nodeValue) => {
+      if (domRef.value) {
+        Reflect.set(domRef.value, DOM_TO_NODE_KEY, nodeValue)
+        // console.log('up editorNode',domRef.value, getEditorNodeByDomNode(domRef.value))
       }
     },
   )
-  return {
-    domRef,
-  }
-}
 
-export function useTextDomRef(node: Ref<IJSONNode<any, any>>) {
-  const { domRef } = useDomRef<Text>(node)
+  watch(
+    () => domRef.value,
+    (domValue) => {
+      if (domValue) {
+        Reflect.set(domValue, DOM_TO_NODE_KEY, editorNode.value)
+        // console.log('up domValue', domRef.value, getEditorNodeByDomNode(domValue))
+      }
+    },
+  )
 
-  const instance = getCurrentInstance()
-
-  function setTextNodeRef() {
-    if (instance?.vnode.el) {
-      domRef.value = instance?.vnode.el as Text
-    } else {
-      domRef.value = null
-    }
-  }
-
-  onUpdated(setTextNodeRef)
-  onMounted(setTextNodeRef)
   return {
     domRef,
   }

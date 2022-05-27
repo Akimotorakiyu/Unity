@@ -1,6 +1,6 @@
 export interface IJSONNode<
   Type extends string,
-  Attrs extends Record<string, string>,
+  Attrs extends Record<string, string> & { id: string },
 > {
   type: Type
   content: IJSONNode<any, any>[]
