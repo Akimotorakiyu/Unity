@@ -85,7 +85,6 @@ export const Editor = defineFunctionComponent(() => {
             <div
               ref={editorDomRef}
               contenteditable={false}
-              class={` p-4`}
               tabindex="-1"
               onClick={() => {}}
               onPointerdown={() => {}}

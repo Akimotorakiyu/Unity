@@ -12,7 +12,12 @@ export const PargraphNodeComponent = defineFunctionComponent(
     return {
       render: () => {
         return (
-          <p ref={domRef} data-type={props.node.type} id={props.node.attrs.id}>
+          <p
+            ref={domRef}
+            data-type={props.node.type}
+            id={props.node.attrs.id}
+            class={`deal-empty`}
+          >
             <FragmentContentComponent
               fragment={props.node.content}
             ></FragmentContentComponent>

@@ -17,6 +17,7 @@ export const HeadingNodeComponent = defineFunctionComponent(
             data-type={props.node.type}
             data-level={props.node.attrs.level}
             id={props.node.attrs.id}
+            class={`deal-empty`}
           >
             <FragmentContentComponent
               fragment={props.node.content}

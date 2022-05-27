@@ -15,6 +15,7 @@ export const DocNodeComponent = defineFunctionComponent(
             ref={domRef}
             data-type={props.node.type}
             id={props.node.attrs.id}
+            class={` p-4`}
           >
             <FragmentContentComponent
               fragment={props.node.content}

@@ -1,11 +1,19 @@
 .decoration-color {
   margin: 0 4px;
   &::before {
-    content: "";
+    content: '';
     width: 0.8em;
     height: 0.8em;
     border-radius: 0.2em;
     display: inline-block;
     background-color: var(--color);
+  }
+}
+
+.deal-empty {
+  &:empty {
+    &::before {
+      content: '\feff';
+    }
   }
 }
