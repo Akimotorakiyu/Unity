@@ -7,6 +7,7 @@ import {
   EditorController,
   IJSONNode,
 } from '@essay/pm-view'
+import { CursorComponent } from './cursorComponent/cursor'
 
 function intsertText(editor: EditorController<any>) {
   const tr = editor.state.tr
@@ -69,6 +70,8 @@ export const Editor = defineFunctionComponent(() => {
     editor.event.emit('editor.onMounted')
   })
 
+  const rect = new DOMRect(10, 10, 2, 20)
+
   return {
     render: () => {
       console.log('doc', doc.value)
@@ -80,7 +83,7 @@ export const Editor = defineFunctionComponent(() => {
           </div>
           <div
             contenteditable
-            class={` shadow-md shadow-gray-400 m-4 rounded-md`}
+            class={` shadow-md shadow-gray-400 m-4 rounded-md relative`}
           >
             <div
               ref={editorDomRef}
@@ -89,6 +92,9 @@ export const Editor = defineFunctionComponent(() => {
               onClick={() => {}}
               onPointerdown={() => {}}
             >
+              <div class={`absolute`}>
+                <CursorComponent rect={rect}></CursorComponent>
+              </div>
               <ContentComponent node={doc.value}></ContentComponent>
             </div>
           </div>
