@@ -5,7 +5,6 @@ export const App = defineFunctionComponent(() => {
     render() {
       return (
         <div>
-          hello world
           <Editor></Editor>
         </div>
       )

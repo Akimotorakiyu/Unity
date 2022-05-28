@@ -41,7 +41,7 @@ export function useEditor() {
     editorDomRef,
   )
 
-  useTestTool(editor)
+  const test = useTestTool(editor)
 
   const manager = {
     editor,
@@ -49,6 +49,7 @@ export function useEditor() {
     editorDomRef,
     idToDomMap,
     editorSelection,
+    test,
   }
 
   Reflect.set(window, 'manager', manager)

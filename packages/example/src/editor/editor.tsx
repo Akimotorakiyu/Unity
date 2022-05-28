@@ -16,12 +16,20 @@ export const Editor = defineFunctionComponent(() => {
 
   return {
     render: () => {
-      console.log('doc', doc.value)
-
       return (
         <div>
           <div>
-            <h1 class={` p-4 m-4 font-medium text-lg`}>Editor</h1>
+            <h1 class={` px-4 m-4 font-medium text-lg`}>Editor</h1>
+          </div>
+          <div class={`px-4 m-4 text-gray-600`}>
+            <button
+              class={` bg-green-400 px-2 py-1 rounded-lg text-white`}
+              onClick={() => {
+                editorManager.test.intsertText()
+              }}
+            >
+              添加文字
+            </button>
           </div>
           <div
             contenteditable
