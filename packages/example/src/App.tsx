@@ -1,5 +1,5 @@
+import { Editor } from './editor/editor'
 import { defineFunctionComponent } from './func/defineFunctionComponent'
-import { Editor } from './editor'
 export const App = defineFunctionComponent(() => {
   return {
     render() {

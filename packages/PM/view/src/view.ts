@@ -2,7 +2,7 @@ import { Node as PMNode, Schema } from 'prosemirror-model'
 import { EditorState, TextSelection, Transaction } from 'prosemirror-state'
 import { getEditorNodeByDomNode } from './const'
 import { EditorEvent } from './event'
-import { getIdFormNode, IJSONNode } from './jsonNode'
+import { getIdFormJSONNode, IJSONNode } from './jsonNode'
 import { addUniqueMark } from './schema'
 import { pointToRange } from './util'
 
@@ -31,7 +31,7 @@ function findNodeById(id: string, doc: PMNode) {
   let resPos = 0
 
   doc.nodesBetween(0, doc.nodeSize - 2, (node, pos) => {
-    if (getIdFormNode(node.toJSON() as IJSONNode<any, any>) === id) {
+    if (getIdFormJSONNode(node.toJSON() as IJSONNode<any, any>) === id) {
       resNode = node
       resPos = pos
     }
@@ -66,7 +66,7 @@ export class EditorController<S extends Schema> {
   dealSelection(point: EditorPoint) {
     if (point.domRange) {
       const node = point.editorNode!
-      const id = getIdFormNode(node)
+      const id = getIdFormJSONNode(node)
 
       const res = findNodeById(id, this.state.doc)
       console.log('set selection', id, res)

@@ -1,4 +1,4 @@
-import { defineFunctionComponent } from '../func/defineFunctionComponent'
+import { defineFunctionComponent } from '../../func/defineFunctionComponent'
 
 export const CursorComponent = defineFunctionComponent(
   (props: { rect: DOMRect }) => {
