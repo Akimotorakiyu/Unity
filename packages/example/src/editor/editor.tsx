@@ -42,11 +42,6 @@ export const Editor = defineFunctionComponent(() => {
               onClick={() => {}}
               onPointerdown={() => {}}
             >
-              <div class={`absolute`}>
-                <CursorComponent
-                  rect={editorManager.editorSelection.cursorRect.value}
-                ></CursorComponent>
-              </div>
               <ContentComponent node={doc.value}></ContentComponent>
             </div>
           </div>

@@ -1,10 +1,6 @@
 import { Node as PMNode, ResolvedPos } from 'prosemirror-model'
 import { EditorState } from 'prosemirror-state'
-import {
-  getIdFormJSONNode,
-  getIJSONNodeFromPMNode,
-  IJSONNode,
-} from './jsonNode'
+import { getIdFormJSONNode, getIJSONNodeFromPMNode } from './jsonNode'
 type TCaretPositionFromPoint = (
   x: number,
   y: number,
@@ -42,11 +38,13 @@ export function getCurrentPMNode(pos: ResolvedPos) {
 
 type TDirection = -1 | 0 | 1
 
-export type TRelativeDirection = 'forward' | 'backward'
+export type TRelativeDirection = 'after' | 'before'
+export type TRelativeSide = 'inside' | 'outside'
 
 interface ICursorDesc {
   id: string
   relative: TRelativeDirection
+  side: TRelativeSide
 }
 
 function getFoucsPMNodeFromSelection(
@@ -58,34 +56,57 @@ function getFoucsPMNodeFromSelection(
       if ($head.nodeBefore) {
         return {
           id: getIdFormJSONNode(getIJSONNodeFromPMNode($head.nodeBefore)),
-          relative: 'forward',
+          relative: 'after',
+          side: 'outside',
         }
       } else {
-        throw new Error('未获取到位置')
+        // 位于父节点首位
+        return {
+          id: getIdFormJSONNode(getIJSONNodeFromPMNode($head.parent)),
+          relative: 'before',
+          side: 'inside',
+        }
+        // throw new Error('未获取到位置')
       }
       break
     case 0:
       if ($head.nodeBefore) {
         return {
           id: getIdFormJSONNode(getIJSONNodeFromPMNode($head.nodeBefore)),
-          relative: 'forward',
+          relative: 'after',
+          side: 'outside',
         }
       } else if ($head.nodeAfter) {
         return {
           id: getIdFormJSONNode(getIJSONNodeFromPMNode($head.nodeAfter)),
-          relative: 'backward',
+          relative: 'before',
+          side: 'outside',
         }
       } else {
-        throw new Error('未匹配到的')
+        // 父节点为空节点，返回父节点
+        return {
+          id: getIdFormJSONNode(getIJSONNodeFromPMNode($head.parent)),
+          relative: 'before',
+          side: 'inside',
+        }
+
+        // throw new Error('未匹配到的')
       }
       break
     case -1:
       if ($head.nodeAfter) {
         return {
           id: getIdFormJSONNode(getIJSONNodeFromPMNode($head.nodeAfter)),
-          relative: 'backward',
+          relative: 'before',
+          side: 'outside',
         }
       } else {
+        // 位于父节点末尾
+        return {
+          id: getIdFormJSONNode(getIJSONNodeFromPMNode($head.parent)),
+          relative: 'after',
+          side: 'inside',
+        }
         throw new Error('未匹配到的位置')
       }
       break

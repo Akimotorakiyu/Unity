@@ -73,7 +73,6 @@ export const mySchema = new Schema({
 
 export const addUniqueMark = function (tr: Transaction) {
   tr.doc.nodesBetween(0, tr.doc.nodeSize - 2, (node, pos) => {
-    console.log('addUniqueMark', node, pos)
     if (node.type.name === 'text' && !hasUniqueMark(node)) {
       _addUniqueMarkOnRange(pos, node, tr)
     }

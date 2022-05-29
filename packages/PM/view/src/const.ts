@@ -7,10 +7,10 @@ export function getEditorNodeByDomNode(domNode: Node) {
 
   let currentDomNode: Node | null = domNode
   while (currentDomNode) {
-    const editorNode = Reflect.get(domNode, DOM_TO_NODE_KEY) as IJSONNode<
-      any,
-      any
-    >
+    const editorNode = Reflect.get(
+      currentDomNode,
+      DOM_TO_NODE_KEY,
+    ) as IJSONNode<any, any>
 
     if (editorNode) {
       return editorNode

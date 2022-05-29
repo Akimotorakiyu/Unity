@@ -2,7 +2,11 @@ import { EditorController } from '@essay/pm-view'
 
 export function _intsertText(editor: EditorController<any>) {
   const tr = editor.state.tr
-  tr.insertText('hello world', 1, 1)
+  tr.insertText(
+    'hello world',
+    editor.state.selection.from,
+    editor.state.selection.to,
+  )
   editor.dispatch(tr)
 }
 

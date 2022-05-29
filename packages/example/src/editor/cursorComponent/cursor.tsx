@@ -1,17 +1,19 @@
 import { defineFunctionComponent } from '../../func/defineFunctionComponent'
 
+/**
+ * Todo: 升级城绝对定位的方案
+ */
 export const CursorComponent = defineFunctionComponent(
-  (props: { rect: DOMRect }) => {
+  (props: {}) => {
     return {
       render: () => {
         return (
           <div
-            class={`absolute  bg-green-400 animate-pulse`}
+            class={`bg-green-400 animate-pulse inline-block`}
             style={{
-              transform: `translateX(${props.rect.x}px)translateY(${props.rect.y}px)`,
-              height: `${props.rect.height}px`,
-              width: `${props.rect.width}px`,
-              animationDuration: '1000ms',
+              height: `1em`,
+              width: `2px`,
+              animationDuration: '1600ms',
               animationTimingFunction: 'ease-in-out',
               animationName: 'cursor-fade',
             }}
