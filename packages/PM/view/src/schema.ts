@@ -1,11 +1,10 @@
-import { baseKeymap } from 'prosemirror-commands'
-import { redo, undo } from 'prosemirror-history'
-import { keymap } from 'prosemirror-keymap'
+// import { baseKeymap } from 'prosemirror-commands'
+// import { redo, undo } from 'prosemirror-history'
+// import { keymap } from 'prosemirror-keymap'
 import { Node, Schema } from 'prosemirror-model'
 import { EditorState, Transaction } from 'prosemirror-state'
-import { history } from 'prosemirror-history'
+// import { history } from 'prosemirror-history'
 import { genNanoDomId } from '@essay/nanoid'
-import { IJSONNode } from './jsonNode'
 
 export const mySchema = new Schema({
   nodes: {
@@ -119,12 +118,12 @@ export function createInitState() {
   const initState = EditorState.create({
     schema: mySchema,
     plugins: [
-      keymap(baseKeymap),
-      history(),
-      keymap({
-        'Mod-z': undo,
-        'Shift-Mod-z': redo,
-      }),
+      // keymap(baseKeymap),
+      // history(),
+      // keymap({
+      //   'Mod-z': undo,
+      //   'Shift-Mod-z': redo,
+      // }),
     ],
   })
 
