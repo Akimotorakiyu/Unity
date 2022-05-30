@@ -1,4 +1,3 @@
-import { type EditorView, type EditorProps } from 'prosemirror-view'
 import { EditorState, EditorStateConfig } from './state'
 import { Transaction } from './transaction'
 
@@ -8,7 +7,7 @@ export interface PluginSpec<PluginState> {
   /// The [view props](#view.EditorProps) added by this plugin. Props
   /// that are functions will be bound to have the plugin instance as
   /// their `this` binding.
-  props?: EditorProps
+  // props?: EditorProps
 
   /// Allows a plugin to define a [state field](#state.StateField), an
   /// extra slot in the state object in which it can keep its own data.
@@ -24,7 +23,7 @@ export interface PluginSpec<PluginState> {
   /// set something up in the DOM, use this field. The function
   /// will be called when the plugin's state is associated with an
   /// editor view.
-  view?: (view: EditorView) => PluginView
+  // view?: (view: EditorView) => PluginView
 
   /// When present, this will be called before a transaction is
   /// applied by the state, allowing the plugin to cancel it (by
@@ -52,7 +51,7 @@ export interface PluginSpec<PluginState> {
 /// [plugin](#state.PluginSpec.view).
 export type PluginView = {
   /// Called whenever the view's state is updated.
-  update?: (view: EditorView, prevState: EditorState) => void
+  // update?: (view: EditorView, prevState: EditorState) => void
 
   /// Called when the view is destroyed or receives a state
   /// with different plugins.
@@ -82,12 +81,12 @@ export class Plugin<PluginState = any> {
     /// The plugin's [spec object](#state.PluginSpec).
     readonly spec: PluginSpec<PluginState>,
   ) {
-    if (spec.props) bindProps(spec.props, this, this.props)
+    // if (spec.props) bindProps(spec.props, this, this.props)
     this.key = spec.key ? spec.key.key : createKey('plugin')
   }
 
   /// The [props](#view.EditorProps) exported by this plugin.
-  readonly props: EditorProps = {}
+  // readonly props: EditorProps = {}
 
   /// @internal
   key: string
