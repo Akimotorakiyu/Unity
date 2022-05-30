@@ -30,6 +30,10 @@ export function getIJSONNodeFromPMNode(pmNode: PMNode) {
 
 function getUniqueMarkFromJSONNode(jsonNode: IJSONNode<any, any>) {
   if (jsonNode.type === 'text') {
+    if (jsonNode.text?.length !== 1) {
+      throw new Error(`文本节点的长度应为1`)
+    }
+
     const uniqueMarks = jsonNode.marks!.filter((mark) => {
       return mark.type === 'unique'
     })

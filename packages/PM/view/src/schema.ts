@@ -5,6 +5,7 @@ import { Node, Schema } from 'prosemirror-model'
 import { EditorState, Transaction } from 'prosemirror-state'
 // import { history } from 'prosemirror-history'
 import { genNanoDomId } from '@essay/nanoid'
+import { Mark } from '../../model/src/mark'
 
 export const mySchema = new Schema({
   nodes: {
@@ -85,7 +86,7 @@ export const mySchema = new Schema({
 
 export const addUniqueMark = function (tr: Transaction) {
   tr.doc.nodesBetween(0, tr.doc.nodeSize - 2, (node, pos) => {
-    if (node.type.name === 'text' && !hasUniqueMark(node)) {
+    if (node.type.name === 'text' && !getUniqueMarkFromNode(node)) {
       _addUniqueMarkOnRange(pos, node, tr)
     }
   })
@@ -103,22 +104,18 @@ function _addUniqueMarkOnRange(from: number, node: Node, tr: Transaction) {
   }
 }
 
-function getUniqueMarkFromNode(node: Node) {
-  return node.marks.filter((mark) => {
-    return mark.type.name === 'unique'
-  })
-}
-
-function hasUniqueMark(node: Node) {
+function getUniqueMarkFromNode(node: Node): Mark | null {
   if (node.type.name === 'text') {
-    const uniqueMark = getUniqueMarkFromNode(node)
+    const uniqueMark = node.marks.filter((mark) => {
+      return mark.type.name === 'unique'
+    })
     if (uniqueMark.length === 1) {
       if (node.nodeSize > 1) {
         throw new Error('一个带 uniqueMark 的节点的长度不应大于1')
       }
-      return true
+      return uniqueMark[0]
     } else if (uniqueMark.length === 0) {
-      return false
+      return null
     } else {
       throw new Error('一个文本节点只应有一个 uniqueMark')
     }
