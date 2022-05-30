@@ -1,8 +1,4 @@
-import {
-  attempSetIdForJSONDoc,
-  convertPMSelectionToESelection,
-  IJSONNode,
-} from '@essay/pm-view'
+import { convertPMSelectionToESelection, IJSONNode } from '@essay/pm-view'
 import { ref, watch } from 'vue'
 import { createEditor } from '../pm/editor'
 import { createPortal } from '../util/Portal'
@@ -18,8 +14,6 @@ export function useEditor() {
 
   const idToDomMap = useIdToNodeMap()
 
-  attempSetIdForJSONDoc(editor.state.doc)
-
   const doc = ref<IJSONNode<any, any>>(
     editor.state.doc.toJSON() as IJSONNode<any, any>,
   )
@@ -28,7 +22,6 @@ export function useEditor() {
 
   editor.event.on('state.update', (state) => {
     console.log('update', state.doc.toJSON(), state.selection.toJSON())
-    attempSetIdForJSONDoc(editor.state.doc)
     doc.value = state.doc.toJSON() as IJSONNode<any, any>
 
     const editorSelection = convertPMSelectionToESelection(state)

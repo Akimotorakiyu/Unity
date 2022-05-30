@@ -1,14 +1,14 @@
-import OrderedMap from "orderedmap"
+import OrderedMap from 'orderedmap'
 
-import {Node, TextNode} from "./node"
-import {Fragment} from "./fragment"
-import {Mark} from "./mark"
-import {ContentMatch} from "./content"
-import {DOMOutputSpec} from "./to_dom"
-import {ParseRule} from "./from_dom"
+import { Node, TextNode } from './node'
+import { Fragment } from './fragment'
+import { Mark } from './mark'
+import { ContentMatch } from './content'
+import { DOMOutputSpec } from './to_dom'
+import { ParseRule } from './from_dom'
 
 /// An object holding the attributes of a node.
-export type Attrs = {readonly [attr: string]: any}
+export type Attrs = { readonly [attr: string]: any }
 
 // For node types where all attrs have a default value (or which don't
 // have any attributes), build up a single reusable default attribute
@@ -31,15 +31,15 @@ function computeAttrs(attrs: Attrs, value: Attrs | null) {
     if (given === undefined) {
       let attr = attrs[name]
       if (attr.hasDefault) given = attr.default
-      else throw new RangeError("No value supplied for attribute " + name)
+      else throw new RangeError('No value supplied for attribute ' + name)
     }
     built[name] = given
   }
   return built
 }
 
-function initAttrs(attrs?: {[name: string]: AttributeSpec}) {
-  let result: {[name: string]: Attribute} = Object.create(null)
+function initAttrs(attrs?: { [name: string]: AttributeSpec }) {
+  let result: { [name: string]: Attribute } = Object.create(null)
   if (attrs) for (let name in attrs) result[name] = new Attribute(attrs[name])
   return result
 }
@@ -52,7 +52,7 @@ export class NodeType {
   /// @internal
   groups: readonly string[]
   /// @internal
-  attrs: {[name: string]: Attribute}
+  attrs: { [name: string]: Attribute }
   /// @internal
   defaultAttrs: Attrs
 
@@ -63,9 +63,9 @@ export class NodeType {
     /// A link back to the `Schema` the node type belongs to.
     readonly schema: Schema,
     /// The spec that this type is based on
-    readonly spec: NodeSpec
+    readonly spec: NodeSpec,
   ) {
-    this.groups = spec.group ? spec.group.split(" ") : []
+    this.groups = spec.group ? spec.group.split(' ') : []
     this.attrs = initAttrs(spec.attrs)
     this.defaultAttrs = defaultAttrs(this.attrs)
 
@@ -73,8 +73,8 @@ export class NodeType {
     ;(this as any).contentMatch = null
     ;(this as any).inlineContent = null
 
-    this.isBlock = !(spec.inline || name == "text")
-    this.isText = name == "text"
+    this.isBlock = !(spec.inline || name == 'text')
+    this.isText = name == 'text'
   }
 
   /// True if this node type has inline content.
@@ -85,18 +85,26 @@ export class NodeType {
   isText: boolean
 
   /// True if this is an inline type.
-  get isInline() { return !this.isBlock }
+  get isInline() {
+    return !this.isBlock
+  }
 
   /// True if this is a textblock type, a block that contains inline
   /// content.
-  get isTextblock() { return this.isBlock && this.inlineContent }
+  get isTextblock() {
+    return this.isBlock && this.inlineContent
+  }
 
   /// True for node types that allow no content.
-  get isLeaf() { return this.contentMatch == ContentMatch.empty }
+  get isLeaf() {
+    return this.contentMatch == ContentMatch.empty
+  }
 
   /// True when this node is an atom, i.e. when it does not have
   /// directly editable content.
-  get isAtom() { return this.isLeaf || !!this.spec.atom }
+  get isAtom() {
+    return this.isLeaf || !!this.spec.atom
+  }
 
   /// The starting match of the node type's content expression.
   contentMatch!: ContentMatch
@@ -106,8 +114,8 @@ export class NodeType {
   markSet: readonly MarkType[] | null = null
 
   /// The node type's [whitespace](#model.NodeSpec.whitespace) option.
-  get whitespace(): "pre" | "normal" {
-    return this.spec.whitespace || (this.spec.code ? "pre" : "normal")
+  get whitespace(): 'pre' | 'normal' {
+    return this.spec.whitespace || (this.spec.code ? 'pre' : 'normal')
   }
 
   /// Tells you whether this node type has any required attributes.
@@ -133,19 +141,38 @@ export class NodeType {
   /// may be a `Fragment`, a node, an array of nodes, or
   /// `null`. Similarly `marks` may be `null` to default to the empty
   /// set of marks.
-  create(attrs: Attrs | null = null, content?: Fragment | Node | readonly Node[] | null, marks?: readonly Mark[]) {
-    if (this.isText) throw new Error("NodeType.create can't construct text nodes")
-    return new Node(this, this.computeAttrs(attrs), Fragment.from(content), Mark.setFrom(marks))
+  create(
+    attrs: Attrs | null = null,
+    content?: Fragment | Node | readonly Node[] | null,
+    marks?: readonly Mark[],
+  ) {
+    if (this.isText)
+      throw new Error("NodeType.create can't construct text nodes")
+    return new Node(
+      this,
+      this.computeAttrs(attrs),
+      Fragment.from(content),
+      Mark.setFrom(marks),
+    )
   }
 
   /// Like [`create`](#model.NodeType.create), but check the given content
   /// against the node type's content restrictions, and throw an error
   /// if it doesn't match.
-  createChecked(attrs: Attrs | null = null, content?: Fragment | Node | readonly Node[] | null, marks?: readonly Mark[]) {
+  createChecked(
+    attrs: Attrs | null = null,
+    content?: Fragment | Node | readonly Node[] | null,
+    marks?: readonly Mark[],
+  ) {
     content = Fragment.from(content)
     if (!this.validContent(content))
-      throw new RangeError("Invalid content for node " + this.name)
-    return new Node(this, this.computeAttrs(attrs), content, Mark.setFrom(marks))
+      throw new RangeError('Invalid content for node ' + this.name)
+    return new Node(
+      this,
+      this.computeAttrs(attrs),
+      content,
+      Mark.setFrom(marks),
+    )
   }
 
   /// Like [`create`](#model.NodeType.create), but see if it is
@@ -154,7 +181,11 @@ export class NodeType {
   /// return null. Note that, due to the fact that required nodes can
   /// always be created, this will always succeed if you pass null or
   /// `Fragment.empty` as content.
-  createAndFill(attrs: Attrs | null = null, content?: Fragment | Node | readonly Node[] | null, marks?: readonly Mark[]) {
+  createAndFill(
+    attrs: Attrs | null = null,
+    content?: Fragment | Node | readonly Node[] | null,
+    marks?: readonly Mark[],
+  ) {
     attrs = this.computeAttrs(attrs)
     content = Fragment.from(content)
     if (content.size) {
@@ -165,7 +196,12 @@ export class NodeType {
     let matched = this.contentMatch.matchFragment(content)
     let after = matched && matched.fillBefore(Fragment.empty, true)
     if (!after) return null
-    return new Node(this, attrs, (content as Fragment).append(after), Mark.setFrom(marks))
+    return new Node(
+      this,
+      attrs,
+      (content as Fragment).append(after),
+      Mark.setFrom(marks),
+    )
   }
 
   /// Returns true if the given fragment is valid content for this node
@@ -186,7 +222,8 @@ export class NodeType {
   /// Test whether the given set of marks are allowed in this node.
   allowsMarks(marks: readonly Mark[]) {
     if (this.markSet == null) return true
-    for (let i = 0; i < marks.length; i++) if (!this.allowsMarkType(marks[i].type)) return false
+    for (let i = 0; i < marks.length; i++)
+      if (!this.allowsMarkType(marks[i].type)) return false
     return true
   }
 
@@ -205,14 +242,23 @@ export class NodeType {
   }
 
   /// @internal
-  static compile(nodes: OrderedMap<NodeSpec>, schema: Schema): {readonly [name: string]: NodeType} {
+  static compile(
+    nodes: OrderedMap<NodeSpec>,
+    schema: Schema,
+  ): { readonly [name: string]: NodeType } {
     let result = Object.create(null)
-    nodes.forEach((name, spec) => result[name] = new NodeType(name, schema, spec))
+    nodes.forEach(
+      (name, spec) => (result[name] = new NodeType(name, schema, spec)),
+    )
 
-    let topType = schema.spec.topNode || "doc"
-    if (!result[topType]) throw new RangeError("Schema is missing its top node type ('" + topType + "')")
+    let topType = schema.spec.topNode || 'doc'
+    if (!result[topType])
+      throw new RangeError(
+        "Schema is missing its top node type ('" + topType + "')",
+      )
     if (!result.text) throw new RangeError("Every schema needs a 'text' type")
-    for (let _ in result.text.attrs) throw new RangeError("The text node type should not have attributes")
+    for (let _ in result.text.attrs)
+      throw new RangeError('The text node type should not have attributes')
 
     return result
   }
@@ -222,11 +268,14 @@ export class NodeType {
 
 class Attribute {
   hasDefault: boolean
-  default: any
+  _default: any
+  get default() {
+    return typeof this._default === 'function' ? this._default() : this._default
+  }
 
   constructor(options: AttributeSpec) {
-    this.hasDefault = Object.prototype.hasOwnProperty.call(options, "default")
-    this.default = options.default
+    this.hasDefault = Object.prototype.hasOwnProperty.call(options, 'default')
+    this._default = options.default
   }
 
   get isRequired() {
@@ -242,7 +291,7 @@ class Attribute {
 /// instantiated once per `Schema`.
 export class MarkType {
   /// @internal
-  attrs: {[name: string]: Attribute}
+  attrs: { [name: string]: Attribute }
   /// @internal
   excluded!: readonly MarkType[]
   /// @internal
@@ -257,7 +306,7 @@ export class MarkType {
     /// The schema that this mark type instance is part of.
     readonly schema: Schema,
     /// The spec on which the type is based.
-    readonly spec: MarkSpec
+    readonly spec: MarkSpec,
   ) {
     this.attrs = initAttrs(spec.attrs)
     ;(this as any).excluded = null
@@ -275,25 +324,28 @@ export class MarkType {
 
   /// @internal
   static compile(marks: OrderedMap<MarkSpec>, schema: Schema) {
-    let result = Object.create(null), rank = 0
-    marks.forEach((name, spec) => result[name] = new MarkType(name, rank++, schema, spec))
+    let result = Object.create(null),
+      rank = 0
+    marks.forEach(
+      (name, spec) => (result[name] = new MarkType(name, rank++, schema, spec)),
+    )
     return result
   }
 
   /// When there is a mark of this type in the given set, a new set
   /// without it is returned. Otherwise, the input set is returned.
   removeFromSet(set: readonly Mark[]): readonly Mark[] {
-    for (var i = 0; i < set.length; i++) if (set[i].type == this) {
-      set = set.slice(0, i).concat(set.slice(i + 1))
-      i--
-    }
+    for (var i = 0; i < set.length; i++)
+      if (set[i].type == this) {
+        set = set.slice(0, i).concat(set.slice(i + 1))
+        i--
+      }
     return set
   }
 
   /// Tests whether there is a mark of this type in the given set.
   isInSet(set: readonly Mark[]): Mark | undefined {
-    for (let i = 0; i < set.length; i++)
-      if (set[i].type == this) return set[i]
+    for (let i = 0; i < set.length; i++) if (set[i].type == this) return set[i]
   }
 
   /// Queries whether a given mark type is
@@ -312,13 +364,13 @@ export interface SchemaSpec {
   /// determines which [parse rules](#model.NodeSpec.parseDOM) take
   /// precedence by default, and which nodes come first in a given
   /// [group](#model.NodeSpec.group).
-  nodes: {[name: string]: NodeSpec} | OrderedMap<NodeSpec>,
+  nodes: { [name: string]: NodeSpec } | OrderedMap<NodeSpec>
 
   /// The mark types that exist in this schema. The order in which they
   /// are provided determines the order in which [mark
   /// sets](#model.Mark.addToSet) are sorted and in which [parse
   /// rules](#model.MarkSpec.parseDOM) are tried.
-  marks?: {[name: string]: MarkSpec} | OrderedMap<MarkSpec>
+  marks?: { [name: string]: MarkSpec } | OrderedMap<MarkSpec>
 
   /// The name of the default top-level node for the schema. Defaults
   /// to `"doc"`.
@@ -353,7 +405,7 @@ export interface NodeSpec {
   atom?: boolean
 
   /// The attributes that nodes of this type get.
-  attrs?: {[name: string]: AttributeSpec}
+  attrs?: { [name: string]: AttributeSpec }
 
   /// Controls whether nodes of this type can be selected as a [node
   /// selection](#state.NodeSelection). Defaults to true for non-text
@@ -377,7 +429,7 @@ export interface NodeSpec {
   /// will default to `"pre"`. Note that this option doesn't influence
   /// the way the node is rendered—that should be handled by `toDOM`
   /// and/or styling.
-  whitespace?: "pre" | "normal"
+  whitespace?: 'pre' | 'normal'
 
   /// Determines whether this node is considered an important parent
   /// node during replace operations (such as paste). Non-defining (the
@@ -435,7 +487,7 @@ export interface NodeSpec {
 /// Used to define marks when creating a schema.
 export interface MarkSpec {
   /// The attributes that marks of this type get.
-  attrs?: {[name: string]: AttributeSpec}
+  attrs?: { [name: string]: AttributeSpec }
 
   /// Whether this mark should be active when the cursor is positioned
   /// at its end (or at its start when that is also the start of the
@@ -502,23 +554,23 @@ export class Schema {
   /// [`OrderedMap`](https://github.com/marijnh/orderedmap) instances
   /// (not raw objects).
   spec: {
-    nodes: OrderedMap<NodeSpec>,
-    marks: OrderedMap<MarkSpec>,
+    nodes: OrderedMap<NodeSpec>
+    marks: OrderedMap<MarkSpec>
     topNode?: string
   }
 
   /// An object mapping the schema's node names to node type objects.
-  nodes: {readonly [name: string]: NodeType}
+  nodes: { readonly [name: string]: NodeType }
 
   /// A map from mark names to mark type objects.
-  marks: {readonly [name: string]: MarkType}
+  marks: { readonly [name: string]: MarkType }
 
   /// Construct a schema from a schema [specification](#model.SchemaSpec).
   constructor(spec: SchemaSpec) {
     this.spec = {
       nodes: OrderedMap.from(spec.nodes),
       marks: OrderedMap.from(spec.marks || {}),
-      topNode: spec.topNode
+      topNode: spec.topNode,
     }
 
     this.nodes = NodeType.compile(this.spec.nodes, this)
@@ -527,23 +579,40 @@ export class Schema {
     let contentExprCache = Object.create(null)
     for (let prop in this.nodes) {
       if (prop in this.marks)
-        throw new RangeError(prop + " can not be both a node and a mark")
-      let type = this.nodes[prop], contentExpr = type.spec.content || "", markExpr = type.spec.marks
-      type.contentMatch = contentExprCache[contentExpr] ||
-        (contentExprCache[contentExpr] = ContentMatch.parse(contentExpr, this.nodes))
+        throw new RangeError(prop + ' can not be both a node and a mark')
+      let type = this.nodes[prop],
+        contentExpr = type.spec.content || '',
+        markExpr = type.spec.marks
+      type.contentMatch =
+        contentExprCache[contentExpr] ||
+        (contentExprCache[contentExpr] = ContentMatch.parse(
+          contentExpr,
+          this.nodes,
+        ))
       ;(type as any).inlineContent = type.contentMatch.inlineContent
-      type.markSet = markExpr == "_" ? null :
-        markExpr ? gatherMarks(this, markExpr.split(" ")) :
-        markExpr == "" || !type.inlineContent ? [] : null
+      type.markSet =
+        markExpr == '_'
+          ? null
+          : markExpr
+          ? gatherMarks(this, markExpr.split(' '))
+          : markExpr == '' || !type.inlineContent
+          ? []
+          : null
     }
     for (let prop in this.marks) {
-      let type = this.marks[prop], excl = type.spec.excludes
-      type.excluded = excl == null ? [type] : excl == "" ? [] : gatherMarks(this, excl.split(" "))
+      let type = this.marks[prop],
+        excl = type.spec.excludes
+      type.excluded =
+        excl == null
+          ? [type]
+          : excl == ''
+          ? []
+          : gatherMarks(this, excl.split(' '))
     }
 
     this.nodeFromJSON = this.nodeFromJSON.bind(this)
     this.markFromJSON = this.markFromJSON.bind(this)
-    this.topNodeType = this.nodes[this.spec.topNode || "doc"]
+    this.topNodeType = this.nodes[this.spec.topNode || 'doc']
     this.cached.wrappings = Object.create(null)
   }
 
@@ -554,22 +623,25 @@ export class Schema {
   /// An object for storing whatever values modules may want to
   /// compute and cache per schema. (If you want to store something
   /// in it, try to use property names unlikely to clash.)
-  cached: {[key: string]: any} = Object.create(null)
+  cached: { [key: string]: any } = Object.create(null)
 
   /// Create a node in this schema. The `type` may be a string or a
   /// `NodeType` instance. Attributes will be extended with defaults,
   /// `content` may be a `Fragment`, `null`, a `Node`, or an array of
   /// nodes.
-  node(type: string | NodeType,
-       attrs: Attrs | null = null,
-       content?: Fragment | Node | readonly Node[],
-       marks?: readonly Mark[]) {
-    if (typeof type == "string")
-      type = this.nodeType(type)
+  node(
+    type: string | NodeType,
+    attrs: Attrs | null = null,
+    content?: Fragment | Node | readonly Node[],
+    marks?: readonly Mark[],
+  ) {
+    if (typeof type == 'string') type = this.nodeType(type)
     else if (!(type instanceof NodeType))
-      throw new RangeError("Invalid node type: " + type)
+      throw new RangeError('Invalid node type: ' + type)
     else if (type.schema != this)
-      throw new RangeError("Node type from different schema used (" + type.name + ")")
+      throw new RangeError(
+        'Node type from different schema used (' + type.name + ')',
+      )
 
     return type.createChecked(attrs, content, marks)
   }
@@ -583,7 +655,7 @@ export class Schema {
 
   /// Create a mark with the given type and attributes.
   mark(type: string | MarkType, attrs?: Attrs | null) {
-    if (typeof type == "string") type = this.marks[type]
+    if (typeof type == 'string') type = this.marks[type]
     return type.create(attrs)
   }
 
@@ -602,7 +674,7 @@ export class Schema {
   /// @internal
   nodeType(name: string) {
     let found = this.nodes[name]
-    if (!found) throw new RangeError("Unknown node type: " + name)
+    if (!found) throw new RangeError('Unknown node type: ' + name)
     return found
   }
 }
@@ -610,14 +682,19 @@ export class Schema {
 function gatherMarks(schema: Schema, marks: readonly string[]) {
   let found = []
   for (let i = 0; i < marks.length; i++) {
-    let name = marks[i], mark = schema.marks[name], ok = mark
+    let name = marks[i],
+      mark = schema.marks[name],
+      ok = mark
     if (mark) {
       found.push(mark)
     } else {
       for (let prop in schema.marks) {
         let mark = schema.marks[prop]
-        if (name == "_" || (mark.spec.group && mark.spec.group.split(" ").indexOf(name) > -1))
-          found.push(ok = mark)
+        if (
+          name == '_' ||
+          (mark.spec.group && mark.spec.group.split(' ').indexOf(name) > -1)
+        )
+          found.push((ok = mark))
       }
     }
     if (!ok) throw new SyntaxError("Unknown mark type: '" + marks[i] + "'")

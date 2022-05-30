@@ -9,13 +9,18 @@ import { genNanoDomId } from '@essay/nanoid'
 export const mySchema = new Schema({
   nodes: {
     doc: {
+      attrs: {
+        id: {
+          default: () => genNanoDomId(),
+        },
+      },
       content: 'block+',
     },
     pargraph: {
       group: 'block',
       attrs: {
         id: {
-          default: '',
+          default: () => genNanoDomId(),
         },
         align: {
           default: 'left',
@@ -38,7 +43,7 @@ export const mySchema = new Schema({
     heading: {
       attrs: {
         id: {
-          default: '',
+          default: () => genNanoDomId(),
         },
         level: {
           default: '1',
@@ -56,7 +61,9 @@ export const mySchema = new Schema({
       excludes: '',
       inclusive: false,
       attrs: {
-        id: {},
+        id: {
+          default: () => genNanoDomId(),
+        },
       },
       parseDOM: [{ tag: 'b' }],
       toDOM() {
