@@ -256,9 +256,12 @@ export class NodeType {
       throw new RangeError(
         "Schema is missing its top node type ('" + topType + "')",
       )
+
     if (!result.text) throw new RangeError("Every schema needs a 'text' type")
-    for (let _ in result.text.attrs)
-      throw new RangeError('The text node type should not have attributes')
+
+    // 注释掉以 允许 text 节点有 attrs
+    // for (let _ in result.text.attrs)
+    //   throw new RangeError('The text node type should not have attributes')
 
     return result
   }

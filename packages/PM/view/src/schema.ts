@@ -54,7 +54,13 @@ export const mySchema = new Schema({
       },
     },
 
-    text: {},
+    text: {
+      attrs: {
+        id: {
+          default: () => genNanoDomId(),
+        },
+      },
+    },
   },
   marks: {
     unique: {
