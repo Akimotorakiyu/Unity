@@ -1,20 +1,28 @@
-import { Slice, Fragment } from 'prosemirror-model'
+import {
+  Slice,
+  Fragment,
+  NodeRange,
+  NodeType,
+  Node,
+  Mark,
+  Attrs,
+  ContentMatch,
+} from 'prosemirror-model'
 
 import { Transform } from './transform'
 import { ReplaceStep, ReplaceAroundStep } from './replace_step'
 
-function canCut(node, start, end) {
+function canCut(node: Node, start: number, end: number) {
   return (
     (start == 0 || node.canReplace(start, node.childCount)) &&
     (end == node.childCount || node.canReplace(0, end))
   )
 }
 
-// :: (NodeRange) → ?number
-// Try to find a target depth to which the content in the given range
-// can be lifted. Will not go across
-// [isolating](#model.NodeSpec.isolating) parent nodes.
-export function liftTarget(range) {
+/// Try to find a target depth to which the content in the given range
+/// can be lifted. Will not go across
+/// [isolating](#model.NodeSpec.isolating) parent nodes.
+export function liftTarget(range: NodeRange): number | null {
   let parent = range.parent
   let content = parent.content.cutByIndex(range.startIndex, range.endIndex)
   for (let depth = range.depth; ; --depth) {
@@ -30,15 +38,10 @@ export function liftTarget(range) {
     )
       break
   }
+  return null
 }
 
-// :: (NodeRange, number) → this
-// Split the content in the given range off from its parent, if there
-// is sibling content before or after it, and move it up the tree to
-// the depth specified by `target`. You'll probably want to use
-// [`liftTarget`](#transform.liftTarget) to compute `target`, to make
-// sure the lift is valid.
-Transform.prototype.lift = function (range, target) {
+export function lift(tr: Transform, range: NodeRange, target: number) {
   let { $from, $to, depth } = range
 
   let gapStart = $from.before(depth + 1),
@@ -67,7 +70,7 @@ Transform.prototype.lift = function (range, target) {
       end++
     }
 
-  return this.step(
+  tr.step(
     new ReplaceAroundStep(
       start,
       end,
@@ -80,28 +83,31 @@ Transform.prototype.lift = function (range, target) {
   )
 }
 
-// :: (NodeRange, NodeType, ?Object, ?NodeRange) → ?[{type: NodeType, attrs: ?Object}]
-// Try to find a valid way to wrap the content in the given range in a
-// node of the given type. May introduce extra nodes around and inside
-// the wrapper node, if necessary. Returns null if no valid wrapping
-// could be found. When `innerRange` is given, that range's content is
-// used as the content to fit into the wrapping, instead of the
-// content of `range`.
-export function findWrapping(range, nodeType, attrs, innerRange = range) {
+/// Try to find a valid way to wrap the content in the given range in a
+/// node of the given type. May introduce extra nodes around and inside
+/// the wrapper node, if necessary. Returns null if no valid wrapping
+/// could be found. When `innerRange` is given, that range's content is
+/// used as the content to fit into the wrapping, instead of the
+/// content of `range`.
+export function findWrapping(
+  range: NodeRange,
+  nodeType: NodeType,
+  attrs: Attrs | null = null,
+  innerRange = range,
+): { type: NodeType; attrs: Attrs | null }[] | null {
   let around = findWrappingOutside(range, nodeType)
   let inner = around && findWrappingInside(innerRange, nodeType)
   if (!inner) return null
-  return around
-    .map(withAttrs)
+  return (around!.map(withAttrs) as { type: NodeType; attrs: Attrs | null }[])
     .concat({ type: nodeType, attrs })
     .concat(inner.map(withAttrs))
 }
 
-function withAttrs(type) {
+function withAttrs(type: NodeType) {
   return { type, attrs: null }
 }
 
-function findWrappingOutside(range, type) {
+function findWrappingOutside(range: NodeRange, type: NodeType) {
   let { parent, startIndex, endIndex } = range
   let around = parent.contentMatchAt(startIndex).findWrapping(type)
   if (!around) return null
@@ -109,24 +115,24 @@ function findWrappingOutside(range, type) {
   return parent.canReplaceWith(startIndex, endIndex, outer) ? around : null
 }
 
-function findWrappingInside(range, type) {
+function findWrappingInside(range: NodeRange, type: NodeType) {
   let { parent, startIndex, endIndex } = range
   let inner = parent.child(startIndex)
   let inside = type.contentMatch.findWrapping(inner.type)
   if (!inside) return null
   let lastType = inside.length ? inside[inside.length - 1] : type
-  let innerMatch = lastType.contentMatch
+  let innerMatch: ContentMatch | null = lastType.contentMatch
   for (let i = startIndex; innerMatch && i < endIndex; i++)
     innerMatch = innerMatch.matchType(parent.child(i).type)
   if (!innerMatch || !innerMatch.validEnd) return null
   return inside
 }
 
-// :: (NodeRange, [{type: NodeType, attrs: ?Object}]) → this
-// Wrap the given [range](#model.NodeRange) in the given set of wrappers.
-// The wrappers are assumed to be valid in this position, and should
-// probably be computed with [`findWrapping`](#transform.findWrapping).
-Transform.prototype.wrap = function (range, wrappers) {
+export function wrap(
+  tr: Transform,
+  range: NodeRange,
+  wrappers: readonly { type: NodeType; attrs?: Attrs | null }[],
+) {
   let content = Fragment.empty
   for (let i = wrappers.length - 1; i >= 0; i--) {
     if (content.size) {
@@ -141,7 +147,7 @@ Transform.prototype.wrap = function (range, wrappers) {
 
   let start = range.start,
     end = range.end
-  return this.step(
+  tr.step(
     new ReplaceAroundStep(
       start,
       end,
@@ -154,25 +160,28 @@ Transform.prototype.wrap = function (range, wrappers) {
   )
 }
 
-// :: (number, ?number, NodeType, ?Object) → this
-// Set the type of all textblocks (partly) between `from` and `to` to
-// the given node type with the given attributes.
-Transform.prototype.setBlockType = function (from, to = from, type, attrs) {
+export function setBlockType(
+  tr: Transform,
+  from: number,
+  to: number,
+  type: NodeType,
+  attrs: Attrs | null,
+) {
   if (!type.isTextblock)
     throw new RangeError('Type given to setBlockType should be a textblock')
-  let mapFrom = this.steps.length
-  this.doc.nodesBetween(from, to, (node, pos) => {
+  let mapFrom = tr.steps.length
+  tr.doc.nodesBetween(from, to, (node, pos) => {
     if (
       node.isTextblock &&
       !node.hasMarkup(type, attrs) &&
-      canChangeType(this.doc, this.mapping.slice(mapFrom).map(pos), type)
+      canChangeType(tr.doc, tr.mapping.slice(mapFrom).map(pos), type)
     ) {
       // Ensure all markup that isn't allowed in the new node type is cleared
-      this.clearIncompatible(this.mapping.slice(mapFrom).map(pos, 1), type)
-      let mapping = this.mapping.slice(mapFrom)
+      tr.clearIncompatible(tr.mapping.slice(mapFrom).map(pos, 1), type)
+      let mapping = tr.mapping.slice(mapFrom)
       let startM = mapping.map(pos, 1),
         endM = mapping.map(pos + node.nodeSize, 1)
-      this.step(
+      tr.step(
         new ReplaceAroundStep(
           startM,
           endM,
@@ -186,41 +195,33 @@ Transform.prototype.setBlockType = function (from, to = from, type, attrs) {
       return false
     }
   })
-  return this
 }
 
-function canChangeType(doc, pos, type) {
+function canChangeType(doc: Node, pos: number, type: NodeType) {
   let $pos = doc.resolve(pos),
     index = $pos.index()
   return $pos.parent.canReplaceWith(index, index + 1, type)
 }
 
-// :: (number, ?NodeType, ?Object, ?[Mark]) → this
-// Change the type, attributes, and/or marks of the node at `pos`.
-// When `type` isn't given, the existing node type is preserved,
-Transform.prototype.setNodeMarkup = function (pos, type, attrs, marks) {
-  let node = this.doc.nodeAt(pos)
+/// Change the type, attributes, and/or marks of the node at `pos`.
+/// When `type` isn't given, the existing node type is preserved,
+export function setNodeMarkup(
+  tr: Transform,
+  pos: number,
+  type: NodeType | undefined | null,
+  attrs: Attrs | null,
+  marks: readonly Mark[],
+) {
+  let node = tr.doc.nodeAt(pos)
   if (!node) throw new RangeError('No node at given position')
-  let notChangeDocStructure = false
-  if (!type) {
-    type = node.type
-    notChangeDocStructure = true
-  } else {
-    notChangeDocStructure = node.type === type
-  }
+  if (!type) type = node.type
   let newNode = type.create(attrs, null, marks || node.marks)
-  if (node.isLeaf)
-    return this.replaceWith(
-      pos,
-      pos + node.nodeSize,
-      newNode,
-      notChangeDocStructure,
-    )
+  if (node.isLeaf) return tr.replaceWith(pos, pos + node.nodeSize, newNode)
 
   if (!type.validContent(node.content))
     throw new RangeError('Invalid content for node type ' + type.name)
 
-  return this.step(
+  tr.step(
     new ReplaceAroundStep(
       pos,
       pos + node.nodeSize,
@@ -229,14 +230,17 @@ Transform.prototype.setNodeMarkup = function (pos, type, attrs, marks) {
       new Slice(Fragment.from(newNode), 0, 0),
       1,
       true,
-      notChangeDocStructure,
     ),
   )
 }
 
-// :: (Node, number, number, ?[?{type: NodeType, attrs: ?Object}]) → bool
-// Check whether splitting at the given position is allowed.
-export function canSplit(doc, pos, depth = 1, typesAfter) {
+/// Check whether splitting at the given position is allowed.
+export function canSplit(
+  doc: Node,
+  pos: number,
+  depth = 1,
+  typesAfter?: (null | { type: NodeType; attrs?: Attrs | null })[],
+): boolean {
   let $pos = doc.resolve(pos),
     base = $pos.depth - depth
   let innerType =
@@ -275,14 +279,13 @@ export function canSplit(doc, pos, depth = 1, typesAfter) {
     )
 }
 
-// :: (number, ?number, ?[?{type: NodeType, attrs: ?Object}]) → this
-// Split the node at the given position, and optionally, if `depth` is
-// greater than one, any number of nodes above that. By default, the
-// parts split off will inherit the node type of the original node.
-// This can be changed by passing an array of types and attributes to
-// use after the split.
-Transform.prototype.split = function (pos, depth = 1, typesAfter) {
-  let $pos = this.doc.resolve(pos),
+export function split(
+  tr: Transform,
+  pos: number,
+  depth = 1,
+  typesAfter?: (null | { type: NodeType; attrs?: Attrs | null })[],
+) {
+  let $pos = tr.doc.resolve(pos),
     before = Fragment.empty,
     after = Fragment.empty
   for (
@@ -298,7 +301,7 @@ Transform.prototype.split = function (pos, depth = 1, typesAfter) {
         : $pos.node(d).copy(after),
     )
   }
-  return this.step(
+  tr.step(
     new ReplaceStep(
       pos,
       pos,
@@ -308,10 +311,9 @@ Transform.prototype.split = function (pos, depth = 1, typesAfter) {
   )
 }
 
-// :: (Node, number) → bool
-// Test whether the blocks before and after a given position can be
-// joined.
-export function canJoin(doc, pos) {
+/// Test whether the blocks before and after a given position can be
+/// joined.
+export function canJoin(doc: Node, pos: number): boolean {
   let $pos = doc.resolve(pos),
     index = $pos.index()
   return (
@@ -320,15 +322,14 @@ export function canJoin(doc, pos) {
   )
 }
 
-function joinable(a, b) {
-  return a && b && !a.isLeaf && a.canAppend(b)
+function joinable(a: Node | null, b: Node | null) {
+  return !!(a && b && !a.isLeaf && a.canAppend(b))
 }
 
-// :: (Node, number, ?number) → ?number
-// Find an ancestor of the given position that can be joined to the
-// block before (or after if `dir` is positive). Returns the joinable
-// point, if any.
-export function joinPoint(doc, pos, dir = -1) {
+/// Find an ancestor of the given position that can be joined to the
+/// block before (or after if `dir` is positive). Returns the joinable
+/// point, if any.
+export function joinPoint(doc: Node, pos: number, dir = -1) {
   let $pos = doc.resolve(pos)
   for (let d = $pos.depth; ; d--) {
     let before,
@@ -357,20 +358,20 @@ export function joinPoint(doc, pos, dir = -1) {
   }
 }
 
-// :: (number, ?number) → this
-// Join the blocks around the given position. If depth is 2, their
-// last and first siblings are also joined, and so on.
-Transform.prototype.join = function (pos, depth = 1) {
+export function join(tr: Transform, pos: number, depth: number) {
   let step = new ReplaceStep(pos - depth, pos + depth, Slice.empty, true)
-  return this.step(step)
+  tr.step(step)
 }
 
-// :: (Node, number, NodeType) → ?number
-// Try to find a point where a node of the given type can be inserted
-// near `pos`, by searching up the node hierarchy when `pos` itself
-// isn't a valid place but is at the start or end of a node. Return
-// null if no position was found.
-export function insertPoint(doc, pos, nodeType) {
+/// Try to find a point where a node of the given type can be inserted
+/// near `pos`, by searching up the node hierarchy when `pos` itself
+/// isn't a valid place but is at the start or end of a node. Return
+/// null if no position was found.
+export function insertPoint(
+  doc: Node,
+  pos: number,
+  nodeType: NodeType,
+): number | null {
   let $pos = doc.resolve(pos)
   if ($pos.parent.canReplaceWith($pos.index(), $pos.index(), nodeType))
     return pos
@@ -389,18 +390,19 @@ export function insertPoint(doc, pos, nodeType) {
         return $pos.after(d + 1)
       if (index < $pos.node(d).childCount) return null
     }
+  return null
 }
 
-// :: (Node, number, Slice) → ?number
-// Finds a position at or around the given position where the given
-// slice can be inserted. Will look at parent nodes' nearest boundary
-// and try there, even if the original position wasn't directly at the
-// start or end of that node. Returns null when no position was found.
-export function dropPoint(doc, pos, slice) {
+/// Finds a position at or around the given position where the given
+/// slice can be inserted. Will look at parent nodes' nearest boundary
+/// and try there, even if the original position wasn't directly at the
+/// start or end of that node. Returns null when no position was found.
+export function dropPoint(doc: Node, pos: number, slice: Slice): number | null {
   let $pos = doc.resolve(pos)
   if (!slice.content.size) return pos
   let content = slice.content
-  for (let i = 0; i < slice.openStart; i++) content = content.firstChild.content
+  for (let i = 0; i < slice.openStart; i++)
+    content = content.firstChild!.content
   for (
     let pass = 1;
     pass <= (slice.openStart == 0 && slice.size ? 2 : 1);
@@ -415,13 +417,13 @@ export function dropPoint(doc, pos, slice) {
           : 1
       let insertPos = $pos.index(d) + (bias > 0 ? 1 : 0)
       let parent = $pos.node(d),
-        fits = false
+        fits: boolean | null = false
       if (pass == 1) {
         fits = parent.canReplace(insertPos, insertPos, content)
       } else {
         let wrapping = parent
           .contentMatchAt(insertPos)
-          .findWrapping(content.firstChild.type)
+          .findWrapping(content.firstChild!.type)
         fits =
           wrapping && parent.canReplaceWith(insertPos, insertPos, wrapping[0])
       }
