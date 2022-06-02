@@ -27,6 +27,7 @@
     "prosemirror-state": "workspace:*",
     "prosemirror-transform": "workspace:*",
     "@essay/nanoid": "workspace:*",
+    "@essay/define-function-component": "workspace:*",
     "vue": "^3.2.31"
   }
 }

@@ -1,8 +1,8 @@
 import { onMounted } from 'vue'
-import { ContentComponent } from '../component'
-import { defineFunctionComponent } from '../func/defineFunctionComponent'
-import { CursorComponent } from './cursorComponent/cursor'
+import { defineFunctionComponent } from '@essay/define-function-component'
 import { editorPortal, useEditor } from './hooks/useEditor'
+import { ContentComponent } from '../component/inner/contentComponent'
+import '../component/index'
 
 export const Editor = defineFunctionComponent(() => {
   const editorManager = useEditor()

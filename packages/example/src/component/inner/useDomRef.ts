@@ -1,6 +1,6 @@
 import { IJSONNode, DOM_TO_NODE_KEY, getIdFormJSONNode } from '@essay/pm-view'
 import { onUnmounted, Ref, ref, watch } from 'vue'
-import { editorPortal } from '../editor/hooks/useEditor'
+import { editorPortal } from '../../editor/hooks/useEditor'
 
 export function useDomRef<N extends Node>(
   editorNode: Ref<IJSONNode<any, any>>,

@@ -1,9 +1,9 @@
-import { defineFunctionComponent } from '../func/defineFunctionComponent'
 import {
   contentNodeComponentMap,
   genComponentName,
 } from './contentNodeComponentMap'
 import { getIdFormJSONNode, IJSONNode } from '@essay/pm-view'
+import { defineFunctionComponent } from '@essay/define-function-component'
 
 export const ContentComponent = defineFunctionComponent(
   (props: { node: IJSONNode<any, any> }) => {

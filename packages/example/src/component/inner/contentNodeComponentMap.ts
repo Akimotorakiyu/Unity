@@ -1,4 +1,4 @@
-import { defineFunctionComponent } from './../func/defineFunctionComponent'
+import { defineFunctionComponent } from '@essay/define-function-component'
 
 export const contentNodeComponentMap = new Map<
   string,

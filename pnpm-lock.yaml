@@ -71,6 +71,7 @@ importers:
 
   packages/example:
     specifiers:
+      '@essay/define-function-component': workspace:*
       '@essay/essay': workspace:*
       '@essay/nanoid': workspace:*
       '@essay/pm-view': workspace:*
@@ -87,6 +88,7 @@ importers:
       vue: ^3.2.31
       windicss: ^3.5.1
     dependencies:
+      '@essay/define-function-component': link:../share/functionComponent
       '@essay/essay': link:../essay/essay
       '@essay/nanoid': link:../share/nanoid
       '@essay/pm-view': link:../PM/view
@@ -117,6 +119,9 @@ importers:
       '@essay/model': link:../../essay/model
 
   packages/share/eventProto:
+    specifiers: {}
+
+  packages/share/functionComponent:
     specifiers: {}
 
   packages/share/nanoid:
@@ -967,7 +972,6 @@ packages:
       }
     dependencies:
       '@vue/shared': 3.2.31
-    dev: false
 
   /@vue/runtime-core/3.2.31:
     resolution:
@@ -977,7 +981,6 @@ packages:
     dependencies:
       '@vue/reactivity': 3.2.31
       '@vue/shared': 3.2.31
-    dev: false
 
   /@vue/runtime-dom/3.2.31:
     resolution:
@@ -988,7 +991,6 @@ packages:
       '@vue/runtime-core': 3.2.31
       '@vue/shared': 3.2.31
       csstype: 2.6.20
-    dev: false
 
   /@vue/server-renderer/3.2.31_vue@3.2.31:
     resolution:
@@ -1001,7 +1003,6 @@ packages:
       '@vue/compiler-ssr': 3.2.31
       '@vue/shared': 3.2.31
       vue: 3.2.31
-    dev: false
 
   /@vue/shared/3.2.31:
     resolution:
@@ -1406,7 +1407,6 @@ packages:
       {
         integrity: sha512-/WwNkdXfckNgw6S5R125rrW8ez139lBHWouiBvX8dfMFtcn6V81REDqnH7+CRpRipfYlyU1CmOnOxrmGcFOjeA==,
       }
-    dev: false
 
   /dargs/7.0.0:
     resolution:
@@ -3327,7 +3327,6 @@ packages:
       '@vue/runtime-dom': 3.2.31
       '@vue/server-renderer': 3.2.31_vue@3.2.31
       '@vue/shared': 3.2.31
-    dev: false
 
   /which/2.0.2:
     resolution:

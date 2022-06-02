@@ -1,0 +1,10 @@
+{
+  "name": "@essay/define-function-component",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}

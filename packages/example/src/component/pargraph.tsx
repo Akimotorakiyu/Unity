@@ -1,8 +1,9 @@
-import { defineFunctionComponent } from '../func/defineFunctionComponent'
-import { FragmentContentComponent } from './content'
+import { defineFunctionComponent } from '@essay/define-function-component'
 import { IJSONNode } from '@essay/pm-view'
-import { genComponentName } from './contentNodeComponentMap'
-import { useDomRef } from './useDomRef'
+
+import { FragmentContentComponent } from './inner/contentComponent'
+import { genComponentName } from './inner/contentNodeComponentMap'
+import { useDomRef } from './inner/useDomRef'
 import { toRef } from 'vue'
 import { editorPortal } from '../editor/hooks/useEditor'
 import { CursorComponent } from '../editor/cursorComponent/cursor'

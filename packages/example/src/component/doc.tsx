@@ -1,9 +1,10 @@
-import { defineFunctionComponent } from '../func/defineFunctionComponent'
+import { defineFunctionComponent } from '@essay/define-function-component'
 import { IJSONNode } from '@essay/pm-view'
-import { FragmentContentComponent } from './content'
-import { genComponentName } from './contentNodeComponentMap'
-import { useDomRef } from './useDomRef'
+
 import { toRef } from 'vue'
+import { FragmentContentComponent } from './inner/contentComponent'
+import { genComponentName } from './inner/contentNodeComponentMap'
+import { useDomRef } from './inner/useDomRef'
 
 export const DocNodeComponent = defineFunctionComponent(
   (props: { node: IJSONNode<any, any> }) => {

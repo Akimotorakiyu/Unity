@@ -1,10 +1,11 @@
-import { defineFunctionComponent } from '../func/defineFunctionComponent'
+import { defineFunctionComponent } from '@essay/define-function-component'
 import { getIdFormJSONNode, IJSONNode } from '@essay/pm-view'
-import { genComponentName } from './contentNodeComponentMap'
-import { useDomRef } from './useDomRef'
+
 import { toRef, createVNode, Text } from 'vue'
 import { editorPortal } from '../editor/hooks/useEditor'
 import { CursorComponent } from '../editor/cursorComponent/cursor'
+import { useDomRef } from './inner/useDomRef'
+import { genComponentName } from './inner/contentNodeComponentMap'
 export const TextNodeComponent = defineFunctionComponent(
   (props: { node: IJSONNode<any, any> }, ctx) => {
     const { domRef } = useDomRef(toRef(props, 'node'))

@@ -1,4 +1,4 @@
-import { defineFunctionComponent } from '../../func/defineFunctionComponent'
+import { defineFunctionComponent } from '@essay/define-function-component'
 
 /**
  * Todo: 升级城绝对定位的方案
