@@ -1,17 +1,18 @@
 import { defineFunctionComponent } from '@essay/define-function-component'
-import { IJSONNode } from '@essay/pm-view'
+import { IJSONNode, TRelativeDirection, TRelativeSide } from '@essay/pm-view'
 
 import { FragmentContentComponent } from './inner/contentComponent'
 import { genComponentName } from './inner/contentNodeComponentMap'
-import { useDomRef } from './inner/useDomRef'
 import { toRef } from 'vue'
 import { editorPortal } from '../editor/hooks/useEditor'
-import { CursorComponent } from '../editor/cursorComponent/cursor'
+import { CursorPlaceholderComponent } from '../editor/cursorComponent/cursor'
 import { getIdFormJSONNode } from '../../../PM/view/src/jsonNode'
+import { useContainerComponentRef } from './inner/useDomRef'
 
 export const PargraphNodeComponent = defineFunctionComponent(
   (props: { node: IJSONNode<any, any> }) => {
-    const { domRef } = useDomRef(toRef(props, 'node'))
+    const { domRef, placeholderRef } =
+      useContainerComponentRef<HTMLParagraphElement>(toRef(props, 'node'))
 
     const id = getIdFormJSONNode(props.node)
 
@@ -28,19 +29,15 @@ export const PargraphNodeComponent = defineFunctionComponent(
             id={props.node.attrs.id}
             class={`deal-empty`}
           >
-            {selection.value?.cursor.id === id &&
-              selection.value?.cursor.side === 'inside' &&
-              selection.value.cursor.relative === 'before' && (
-                <CursorComponent></CursorComponent>
-              )}
+            <CursorPlaceholderComponent
+              ref={placeholderRef.beforePlacehoderVnodeRef}
+            ></CursorPlaceholderComponent>
             <FragmentContentComponent
               fragment={props.node.content}
             ></FragmentContentComponent>
-            {selection.value?.cursor.id === id &&
-              selection.value?.cursor.side === 'inside' &&
-              selection.value.cursor.relative === 'after' && (
-                <CursorComponent></CursorComponent>
-              )}
+            <CursorPlaceholderComponent
+              ref={placeholderRef.afterPlacehoderVnodeRef}
+            ></CursorPlaceholderComponent>
           </p>
         )
       },

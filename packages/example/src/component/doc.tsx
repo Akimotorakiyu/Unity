@@ -4,11 +4,13 @@ import { IJSONNode } from '@essay/pm-view'
 import { toRef } from 'vue'
 import { FragmentContentComponent } from './inner/contentComponent'
 import { genComponentName } from './inner/contentNodeComponentMap'
-import { useDomRef } from './inner/useDomRef'
+import { useContainerComponentRef } from './inner/useDomRef'
 
 export const DocNodeComponent = defineFunctionComponent(
   (props: { node: IJSONNode<any, any> }) => {
-    const { domRef } = useDomRef(toRef(props, 'node'))
+    const { domRef, placeholderRef } =
+      useContainerComponentRef<HTMLParagraphElement>(toRef(props, 'node'))
+
     return {
       render: () => {
         return (

@@ -30,7 +30,7 @@ export function useEditor() {
 
   const editorSelection = useEditorSelection(
     editor,
-    idToDomMap.idToDomNode,
+    idToDomMap.idToViewInfo,
     editorDomRef,
   )
 

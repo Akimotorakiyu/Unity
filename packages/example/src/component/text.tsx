@@ -1,39 +1,30 @@
 import { defineFunctionComponent } from '@essay/define-function-component'
-import { getIdFormJSONNode, IJSONNode } from '@essay/pm-view'
+import {
+  getIdFormJSONNode,
+  IJSONNode,
+  TRelativeDirection,
+  TRelativeSide,
+} from '@essay/pm-view'
 
-import { toRef, createVNode, Text } from 'vue'
+import { toRef, createVNode, Text, getCurrentInstance } from 'vue'
 import { editorPortal } from '../editor/hooks/useEditor'
-import { CursorComponent } from '../editor/cursorComponent/cursor'
-import { useDomRef } from './inner/useDomRef'
+
 import { genComponentName } from './inner/contentNodeComponentMap'
+import { useTextComponentRef } from './inner/useDomRef'
+
 export const TextNodeComponent = defineFunctionComponent(
   (props: { node: IJSONNode<any, any> }, ctx) => {
-    const { domRef } = useDomRef(toRef(props, 'node'))
+    const { domRef } = useTextComponentRef(toRef(props, 'node'))
 
     const id = getIdFormJSONNode(props.node)
 
     const editorManager = editorPortal.injector()
 
-    const selection = editorManager.editorSelection.selection
+    getCurrentInstance()
 
     return {
       render: () => {
-        return (
-          <>
-            {selection.value?.cursor.id === id &&
-              selection.value?.cursor.side === 'outside' &&
-              selection.value.cursor.relative === 'before' && (
-                <CursorComponent></CursorComponent>
-              )}
-            {createVNode(Text, { ref: domRef }, props.node.text, 0)}
-
-            {selection.value?.cursor.id === id &&
-              selection.value?.cursor.side === 'outside' &&
-              selection.value.cursor.relative === 'after' && (
-                <CursorComponent></CursorComponent>
-              )}
-          </>
-        )
+        return createVNode(Text, { ref: domRef }, props.node.text, 0)
       },
     }
   },

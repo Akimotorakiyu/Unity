@@ -1,8 +1,9 @@
-import { onMounted } from 'vue'
+import { nextTick, onMounted } from 'vue'
 import { defineFunctionComponent } from '@essay/define-function-component'
 import { editorPortal, useEditor } from './hooks/useEditor'
 import { ContentComponent } from '../component/inner/contentComponent'
 import '../component/index'
+import { CursorComponent } from './cursorComponent/cursor'
 
 export const Editor = defineFunctionComponent(() => {
   const editorManager = useEditor()
@@ -11,7 +12,9 @@ export const Editor = defineFunctionComponent(() => {
   editorPortal.provider(editorManager)
 
   onMounted(() => {
-    editor.event.emit('editor.onMounted')
+    nextTick(() => {
+      editor.event.emit('editor.onMounted')
+    })
   })
 
   return {
@@ -42,6 +45,11 @@ export const Editor = defineFunctionComponent(() => {
               onClick={() => {}}
               onPointerdown={() => {}}
             >
+              <div class={` absolute`}>
+                <CursorComponent
+                  rect={editorManager.editorSelection.cursorRect.value}
+                ></CursorComponent>
+              </div>
               <ContentComponent node={doc.value}></ContentComponent>
             </div>
           </div>
