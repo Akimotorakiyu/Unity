@@ -8,6 +8,7 @@
   "license": "ISC",
   "devDependencies": {},
   "dependencies": {
-    "@essay/model": "workspace:*"
+    "@essay/model": "workspace:*",
+    "@essay/event-proto": "workspace:*"
   }
 }

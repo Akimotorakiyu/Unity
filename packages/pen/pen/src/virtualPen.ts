@@ -1,22 +1,34 @@
 // https://www.w3.org/TR/input-events-2/#interface-InputEvent-Attributes
 
-export interface DaltaInputEventInfo {
+export interface VirtualInputEventInfo {
   data: string | null
   value: string
   status: 'normal' | 'start' | 'updating' | 'end'
   rawEvent: InputEvent | CompositionEvent
 }
 
+import { EventPrototype } from '@essay/event-proto'
+
+type TEVirtualInputEvent = {
+  input: [VirtualInputEventInfo]
+}
+
+export class VirtualInputEvent extends EventPrototype<TEVirtualInputEvent> {}
+
 export class VirtualPen {
-  constructor(public inputElement?: HTMLTextAreaElement | HTMLTextAreaElement) {
+  constructor(public inputElement?: HTMLInputElement) {
     if (inputElement) {
       this.addListeneres()
     }
   }
 
-  onInput: null | ((inputEventInfo: DaltaInputEventInfo) => void) = null
+  event = new VirtualInputEvent()
 
-  resetInputElement(inputElement: HTMLTextAreaElement | HTMLTextAreaElement) {
+  onInput(inputEventInfo: VirtualInputEventInfo) {
+    this.event.emit('input', inputEventInfo)
+  }
+
+  resetInputElement(inputElement: HTMLInputElement) {
     this.removeListeneres()
 
     this.inputElement = inputElement
@@ -25,34 +37,16 @@ export class VirtualPen {
 
   private addListeneres() {
     this.inputElement?.addEventListener('input', this._inputListener)
-    this.inputElement?.addEventListener(
-      'compositionstart',
-      this.compositionStartListener,
-    )
-    this.inputElement?.addEventListener(
-      'compositionupdate',
-      this.compositionUpdateListener,
-    )
-    this.inputElement?.addEventListener(
-      'compositionend',
-      this.compositionEndListener,
-    )
+    this.inputElement?.addEventListener('compositionstart', this.compositionStartListener)
+    this.inputElement?.addEventListener('compositionupdate', this.compositionUpdateListener)
+    this.inputElement?.addEventListener('compositionend', this.compositionEndListener)
   }
 
   private removeListeneres() {
     this.inputElement?.removeEventListener('input', this._inputListener)
-    this.inputElement?.removeEventListener(
-      'compositionstart',
-      this.compositionStartListener,
-    )
-    this.inputElement?.removeEventListener(
-      'compositionupdate',
-      this.compositionUpdateListener,
-    )
-    this.inputElement?.removeEventListener(
-      'compositionend',
-      this.compositionEndListener,
-    )
+    this.inputElement?.removeEventListener('compositionstart', this.compositionStartListener)
+    this.inputElement?.removeEventListener('compositionupdate', this.compositionUpdateListener)
+    this.inputElement?.removeEventListener('compositionend', this.compositionEndListener)
   }
   private _inputListener = (event: Event) => {
     this.inputListener(event as InputEvent)
@@ -60,38 +54,38 @@ export class VirtualPen {
 
   private inputListener = (event: InputEvent) => {
     const inputElement = event.target as HTMLInputElement | HTMLTextAreaElement
-    this.onInput?.({
+    this.onInput({
       data: event.data,
       value: inputElement.value,
-      rawEvent: event,
       status: 'normal',
+      rawEvent: event,
     })
   }
   private compositionStartListener = (event: CompositionEvent) => {
     const inputElement = event.target as HTMLInputElement | HTMLTextAreaElement
-    this.onInput?.({
+    this.onInput({
       data: event.data,
       value: inputElement.value,
-      rawEvent: event,
       status: 'start',
+      rawEvent: event,
     })
   }
   private compositionUpdateListener = (event: CompositionEvent) => {
     const inputElement = event.target as HTMLInputElement | HTMLTextAreaElement
-    this.onInput?.({
+    this.onInput({
       data: event.data,
       value: inputElement.value,
-      rawEvent: event,
       status: 'updating',
+      rawEvent: event,
     })
   }
   private compositionEndListener = (event: CompositionEvent) => {
     const inputElement = event.target as HTMLInputElement | HTMLTextAreaElement
-    this.onInput?.({
+    this.onInput({
       data: event.data,
       value: inputElement.value,
-      rawEvent: event,
       status: 'end',
+      rawEvent: event,
     })
   }
 }

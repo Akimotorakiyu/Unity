@@ -4,6 +4,7 @@ import { editorPortal, useEditor } from './hooks/useEditor'
 import { ContentComponent } from '../component/inner/contentComponent'
 import '../component/index'
 import { CursorComponent } from '../component/inner/cursor'
+import { InputComponent } from '../component/inner/input'
 
 export const Editor = defineFunctionComponent(() => {
   const editorManager = useEditor()
@@ -28,29 +29,19 @@ export const Editor = defineFunctionComponent(() => {
             <button
               class={` bg-green-400 px-2 py-1 rounded-lg text-white`}
               onClick={() => {
-                editorManager.test.intsertText()
+                editorManager.editor.editorMethods.intsertText()
               }}
             >
               添加文字
             </button>
           </div>
-          <div
-            contenteditable
-            class={` shadow-md shadow-gray-400 m-4 rounded-md relative`}
-          >
-            <div
-              ref={editorDomRef}
-              contenteditable={false}
-              tabindex="-1"
-              onClick={() => {}}
-              onPointerdown={() => {}}
-            >
+          <div contenteditable class={` shadow-md shadow-gray-400 m-4 rounded-md relative`}>
+            <div ref={editorDomRef} contenteditable={false} tabindex="-1" onClick={() => {}} onPointerdown={() => {}}>
               <div class={` absolute`}>
-                <CursorComponent
-                  rect={editorManager.editorSelection.cursorRect.value}
-                ></CursorComponent>
+                <CursorComponent rect={editorManager.editorSelection.cursorRect.value} />
+                <InputComponent rect={editorManager.editorSelection.cursorRect.value} />
               </div>
-              <ContentComponent node={doc.value}></ContentComponent>
+              <ContentComponent node={doc.value} />
             </div>
           </div>
         </div>

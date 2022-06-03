@@ -47,10 +47,22 @@ function findNodeById(id: string, doc: PMNode) {
   }
 }
 
-export class EditorController<S extends Schema> {
+class EditorMethods {
+  constructor(public editorController: EditorController) {}
+  intsertText(text: string = 'hello world') {
+    const editor = this.editorController
+    const tr = editor.state.tr
+    tr.insertText(text, editor.state.selection.from, editor.state.selection.to)
+    editor.dispatch(tr)
+  }
+}
+
+export class EditorController {
   readonly event: EditorEvent = new EditorEvent()
-  constructor(public state: EditorState<S>) {}
+  constructor(public state: EditorState) {}
   dom: HTMLDivElement | null = null
+
+  editorMethods = new EditorMethods(this)
 
   init(dom: HTMLDivElement) {
     dom.addEventListener('click', this.onClick)
@@ -73,12 +85,7 @@ export class EditorController<S extends Schema> {
 
       if (res) {
         const tr = this.state.tr
-        tr.setSelection(
-          new TextSelection(
-            this.state.doc.resolve(res.pos),
-            this.state.doc.resolve(res.pos),
-          ),
-        )
+        tr.setSelection(new TextSelection(this.state.doc.resolve(res.pos), this.state.doc.resolve(res.pos)))
         this.dispatch(tr)
       }
     }
@@ -103,7 +110,7 @@ export class EditorController<S extends Schema> {
     this.update(newState, tr)
   }
 
-  update(newState: EditorState<S>, tr?: Transaction) {
+  update(newState: EditorState, tr?: Transaction) {
     const oldState = this.state
     this.state = newState
 
@@ -113,16 +120,10 @@ export class EditorController<S extends Schema> {
   editable: boolean = true
   composing: boolean = false
 
-  posAtCoords(coords: {
-    left: number
-    top: number
-  }): { pos: number; inside: number } | null | undefined {
+  posAtCoords(coords: { left: number; top: number }): { pos: number; inside: number } | null | undefined {
     throw new Error('Method not implemented.')
   }
-  coordsAtPos(
-    pos: number,
-    side?: number,
-  ): { left: number; right: number; top: number; bottom: number } {
+  coordsAtPos(pos: number, side?: number): { left: number; right: number; top: number; bottom: number } {
     throw new Error('Method not implemented.')
   }
   domAtPos(pos: number, side?: number): { node: PMNode; offset: number } {
@@ -134,10 +135,7 @@ export class EditorController<S extends Schema> {
   posAtDOM(node: PMNode, offset: number, bias?: number | null): number {
     throw new Error('Method not implemented.')
   }
-  endOfTextblock(
-    dir: 'up' | 'down' | 'left' | 'right' | 'forward' | 'backward',
-    state?: EditorState<any>,
-  ): boolean {
+  endOfTextblock(dir: 'up' | 'down' | 'left' | 'right' | 'forward' | 'backward', state?: EditorState): boolean {
     throw new Error('Method not implemented.')
   }
   destroy(): void {
