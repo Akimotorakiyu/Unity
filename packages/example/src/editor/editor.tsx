@@ -3,7 +3,7 @@ import { defineFunctionComponent } from '@essay/define-function-component'
 import { editorPortal, useEditor } from './hooks/useEditor'
 import { ContentComponent } from '../component/inner/contentComponent'
 import '../component/index'
-import { CursorComponent } from './cursorComponent/cursor'
+import { CursorComponent } from '../component/inner/cursor'
 
 export const Editor = defineFunctionComponent(() => {
   const editorManager = useEditor()

@@ -5,9 +5,9 @@ import { FragmentContentComponent } from './inner/contentComponent'
 import { genComponentName } from './inner/contentNodeComponentMap'
 import { toRef } from 'vue'
 import { editorPortal } from '../editor/hooks/useEditor'
-import { CursorPlaceholderComponent } from '../editor/cursorComponent/cursor'
 import { getIdFormJSONNode } from '../../../PM/view/src/jsonNode'
 import { useContainerComponentRef } from './inner/useDomRef'
+import { CursorPlaceholderComponent } from './inner/cursor'
 
 export const PargraphNodeComponent = defineFunctionComponent(
   (props: { node: IJSONNode<any, any> }) => {
@@ -23,21 +23,16 @@ export const PargraphNodeComponent = defineFunctionComponent(
     return {
       render: () => {
         return (
-          <p
-            ref={domRef}
-            data-type={props.node.type}
-            id={props.node.attrs.id}
-            class={`deal-empty`}
-          >
+          <p ref={domRef} data-type={props.node.type} id={props.node.attrs.id}>
             <CursorPlaceholderComponent
               ref={placeholderRef.beforePlacehoderVnodeRef}
-            ></CursorPlaceholderComponent>
+            />
             <FragmentContentComponent
               fragment={props.node.content}
             ></FragmentContentComponent>
             <CursorPlaceholderComponent
-              ref={placeholderRef.afterPlacehoderVnodeRef}
-            ></CursorPlaceholderComponent>
+              ref={placeholderRef.beforePlacehoderVnodeRef}
+            />
           </p>
         )
       },

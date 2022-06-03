@@ -5,10 +5,10 @@ import {
   TRelativeSide,
   TRelativeDirection,
 } from '@essay/pm-view'
-import { getCurrentInstance, onUnmounted, Ref, ref, watch } from 'vue'
-import { TEditorComponentVNode } from '../../editor/cursorComponent/cursor'
+import { onUnmounted, Ref, ref, watch } from 'vue'
 import { editorPortal } from '../../editor/hooks/useEditor'
 import { calcGapCursor } from '../util/calcCursorRect'
+import { TEditorComponentVNode } from './cursor'
 
 export function useCursorPlaceholderRef() {
   const beforePlacehoderVnodeRef = ref<TEditorComponentVNode | null>(null)

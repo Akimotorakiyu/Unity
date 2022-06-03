@@ -1,10 +1,5 @@
 import { defineFunctionComponent } from '@essay/define-function-component'
-import {
-  getIdFormJSONNode,
-  IJSONNode,
-  TRelativeDirection,
-  TRelativeSide,
-} from '@essay/pm-view'
+import { getIdFormJSONNode, IJSONNode } from '@essay/pm-view'
 
 import { toRef, createVNode, Text, getCurrentInstance } from 'vue'
 import { editorPortal } from '../editor/hooks/useEditor'
