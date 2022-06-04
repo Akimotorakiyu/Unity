@@ -17,6 +17,21 @@ importers:
       pretty-quick: 3.1.3_prettier@2.6.2
       typescript: 4.6.3
 
+  packages/PM/commands:
+    specifiers:
+      '@types/orderedmap': ^1.0.0
+      orderedmap: ^1.1.0
+      prosemirror-model: workspace:*
+      prosemirror-state: workspace:*
+      prosemirror-transform: workspace:*
+    dependencies:
+      orderedmap: 1.1.7
+      prosemirror-model: link:../model
+      prosemirror-state: link:../state
+      prosemirror-transform: link:../transform
+    devDependencies:
+      '@types/orderedmap': 1.0.0
+
   packages/PM/model:
     specifiers:
       '@types/orderedmap': ^1.0.0
@@ -44,12 +59,14 @@ importers:
     specifiers:
       '@essay/event-proto': workspace:*
       '@essay/nanoid': workspace:*
+      prosemirror-commands: workspace:*
       prosemirror-model: workspace:*
       prosemirror-state: workspace:*
       prosemirror-transform: workspace:*
     dependencies:
       '@essay/event-proto': link:../../share/eventProto
       '@essay/nanoid': link:../../share/nanoid
+      prosemirror-commands: link:../commands
       prosemirror-model: link:../model
       prosemirror-state: link:../state
       prosemirror-transform: link:../transform

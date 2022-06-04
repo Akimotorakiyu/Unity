@@ -1,11 +1,11 @@
-import { Node as PMNode, Schema } from 'prosemirror-model'
+import { Node as PMNode } from 'prosemirror-model'
 import { EditorState, TextSelection, Transaction } from 'prosemirror-state'
 import { getEditorNodeByDomNode } from './const'
 import { EditorEvent } from './event'
 import { getIdFormJSONNode, IJSONNode } from './jsonNode'
 import { addUniqueMark } from './schema'
 import { pointToRange } from './util'
-
+import { backspace } from 'prosemirror-commands'
 class EditorPoint {
   constructor(public readonly x: number, public readonly y: number) {
     this.domRange = pointToRange(this.x, this.y)
@@ -49,10 +49,21 @@ function findNodeById(id: string, doc: PMNode) {
 
 class EditorMethods {
   constructor(public editorController: EditorController) {}
-  intsertText(text: string = 'hello world') {
+  intsertText(text: string) {
     const editor = this.editorController
     const tr = editor.state.tr
     tr.insertText(text, editor.state.selection.from, editor.state.selection.to)
+    editor.dispatch(tr)
+  }
+
+  // todo: 完善删除逻辑
+  deleteContentBackward() {
+    const editor = this.editorController
+    const tr = editor.state.tr
+    tr.setSelection(
+      new TextSelection(editor.state.doc.resolve(editor.state.selection.head - 1), editor.state.selection.$head),
+    )
+    tr.deleteSelection()
     editor.dispatch(tr)
   }
 }

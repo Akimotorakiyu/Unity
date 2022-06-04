@@ -25,16 +25,7 @@ export const Editor = defineFunctionComponent(() => {
           <div>
             <h1 class={` px-4 m-4 font-medium text-lg`}>Editor</h1>
           </div>
-          <div class={`px-4 m-4 text-gray-600`}>
-            <button
-              class={` bg-green-400 px-2 py-1 rounded-lg text-white`}
-              onClick={() => {
-                editorManager.editor.editorMethods.intsertText()
-              }}
-            >
-              添加文字
-            </button>
-          </div>
+          <div class={`px-4 m-4 text-gray-600`}></div>
           <div contenteditable class={` shadow-md shadow-gray-400 m-4 rounded-md relative`}>
             <div ref={editorDomRef} contenteditable={false} tabindex="-1" onClick={() => {}} onPointerdown={() => {}}>
               <div class={` absolute`}>

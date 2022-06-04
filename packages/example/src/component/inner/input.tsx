@@ -17,10 +17,15 @@ export const InputComponent = defineFunctionComponent((props: { rect: DOMRect })
 
   virtualPen.event.on('input', (virtualInputEventInfo) => {
     console.log('virtualInputEventInfo', virtualInputEventInfo)
-
     if (virtualInputEventInfo.status === 'normal' || virtualInputEventInfo.status === 'end') {
       editorManager.editor.editorMethods.intsertText(virtualInputEventInfo.data || '')
     }
+  })
+
+  virtualPen.event.on('deleteContentBackward', () => {
+    console.log('deleteContentBackward')
+
+    editorManager.editor.editorMethods.deleteContentBackward()
   })
 
   onUpdated(() => {

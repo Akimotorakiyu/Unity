@@ -13,7 +13,16 @@ import { EventPrototype } from '@essay/event-proto'
 
 type TEVirtualInputEvent = {
   input: [VirtualInputEventInfo]
+  deleteContentBackward: []
 }
+
+type THTMLInputElementInputType =
+  | 'deleteContentBackward'
+  | 'insertText'
+  | 'insertCompositionText'
+  | 'insertFromPaste'
+  | 'historyUndo'
+  | 'insertParagraph'
 
 export class VirtualInputEvent extends EventPrototype<TEVirtualInputEvent> {}
 
@@ -47,6 +56,7 @@ export class VirtualPen {
     this.inputElement?.addEventListener('compositionstart', this.compositionStartListener)
     this.inputElement?.addEventListener('compositionupdate', this.compositionUpdateListener)
     this.inputElement?.addEventListener('compositionend', this.compositionEndListener)
+    this.inputElement?.addEventListener('keydown', this.keyDownListener)
   }
 
   private removeListeneres() {
@@ -54,9 +64,10 @@ export class VirtualPen {
     this.inputElement?.removeEventListener('compositionstart', this.compositionStartListener)
     this.inputElement?.removeEventListener('compositionupdate', this.compositionUpdateListener)
     this.inputElement?.removeEventListener('compositionend', this.compositionEndListener)
+    this.inputElement?.removeEventListener('keydown', this.keyDownListener)
   }
   private _inputListener = (event: Event) => {
-    this.inputListener(event as InputEvent)
+    this.inputRulerSwitcher(event as InputEvent)
   }
 
   static resetInputElementContent(inputElement?: HTMLInputElement) {
@@ -76,6 +87,31 @@ export class VirtualPen {
       })
 
       VirtualPen.resetInputElementContent(inputElement)
+    }
+  }
+
+  private inputRulerSwitcher = (event: InputEvent) => {
+    const inputtype = event.inputType as THTMLInputElementInputType
+
+    switch (inputtype) {
+      case 'insertText':
+        this.inputListener(event)
+        break
+      case 'deleteContentBackward':
+        this.event.emit('deleteContentBackward')
+        break
+      case 'historyUndo':
+      case 'insertParagraph':
+      case 'insertFromPaste':
+      case 'insertCompositionText':
+        break
+
+      default:
+        const n: never = inputtype
+        if (n) {
+          throw new Error(`未定义的输入类型 ${event.inputType}`)
+        }
+        break
     }
   }
   private compositionStartListener = (event: CompositionEvent) => {
@@ -108,5 +144,12 @@ export class VirtualPen {
     })
     this.status = 'normal'
     VirtualPen.resetInputElementContent(inputElement)
+  }
+
+  private keyDownListener = (event: KeyboardEvent) => {
+    console.log('event.key', event.key)
+    if (event.key === 'Backspace') {
+      this.event.emit('deleteContentBackward')
+    }
   }
 }
