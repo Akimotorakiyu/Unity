@@ -1,9 +1,11 @@
 // https://www.w3.org/TR/input-events-2/#interface-InputEvent-Attributes
 
+type TInputStatus = 'normal' | 'start' | 'updating' | 'end'
+
 export interface VirtualInputEventInfo {
   data: string | null
   value: string
-  status: 'normal' | 'start' | 'updating' | 'end'
+  status: TInputStatus
   rawEvent: InputEvent | CompositionEvent
 }
 
@@ -22,10 +24,15 @@ export class VirtualPen {
     }
   }
 
+  status: 'normal' | 'composing' = 'normal'
+
   event = new VirtualInputEvent()
 
   onInput(inputEventInfo: VirtualInputEventInfo) {
     this.event.emit('input', inputEventInfo)
+    // if (inputEventInfo.status === 'normal' && this.inputElement) {
+    //   this.inputElement.value = ''
+    // }
   }
 
   resetInputElement(inputElement: HTMLInputElement) {
@@ -52,26 +59,37 @@ export class VirtualPen {
     this.inputListener(event as InputEvent)
   }
 
+  static resetInputElementContent(inputElement?: HTMLInputElement) {
+    if (inputElement) {
+      inputElement.value = ''
+    }
+  }
+
   private inputListener = (event: InputEvent) => {
-    const inputElement = event.target as HTMLInputElement | HTMLTextAreaElement
-    this.onInput({
-      data: event.data,
-      value: inputElement.value,
-      status: 'normal',
-      rawEvent: event,
-    })
+    if (this.status === 'normal') {
+      const inputElement = event.target as HTMLInputElement
+      this.onInput({
+        data: event.data,
+        value: inputElement.value,
+        status: 'normal',
+        rawEvent: event,
+      })
+
+      VirtualPen.resetInputElementContent(inputElement)
+    }
   }
   private compositionStartListener = (event: CompositionEvent) => {
-    const inputElement = event.target as HTMLInputElement | HTMLTextAreaElement
+    const inputElement = event.target as HTMLInputElement
     this.onInput({
       data: event.data,
       value: inputElement.value,
       status: 'start',
       rawEvent: event,
     })
+    this.status = 'composing'
   }
   private compositionUpdateListener = (event: CompositionEvent) => {
-    const inputElement = event.target as HTMLInputElement | HTMLTextAreaElement
+    const inputElement = event.target as HTMLInputElement
     this.onInput({
       data: event.data,
       value: inputElement.value,
@@ -79,13 +97,16 @@ export class VirtualPen {
       rawEvent: event,
     })
   }
+
   private compositionEndListener = (event: CompositionEvent) => {
-    const inputElement = event.target as HTMLInputElement | HTMLTextAreaElement
+    const inputElement = event.target as HTMLInputElement
     this.onInput({
       data: event.data,
       value: inputElement.value,
       status: 'end',
       rawEvent: event,
     })
+    this.status = 'normal'
+    VirtualPen.resetInputElementContent(inputElement)
   }
 }
