@@ -141,19 +141,9 @@ export class NodeType {
   /// may be a `Fragment`, a node, an array of nodes, or
   /// `null`. Similarly `marks` may be `null` to default to the empty
   /// set of marks.
-  create(
-    attrs: Attrs | null = null,
-    content?: Fragment | Node | readonly Node[] | null,
-    marks?: readonly Mark[],
-  ) {
-    if (this.isText)
-      throw new Error("NodeType.create can't construct text nodes")
-    return new Node(
-      this,
-      this.computeAttrs(attrs),
-      Fragment.from(content),
-      Mark.setFrom(marks),
-    )
+  create(attrs: Attrs | null = null, content?: Fragment | Node | readonly Node[] | null, marks?: readonly Mark[]) {
+    if (this.isText) throw new Error("NodeType.create can't construct text nodes")
+    return new Node(this, this.computeAttrs(attrs), Fragment.from(content), Mark.setFrom(marks))
   }
 
   /// Like [`create`](#model.NodeType.create), but check the given content
@@ -165,14 +155,8 @@ export class NodeType {
     marks?: readonly Mark[],
   ) {
     content = Fragment.from(content)
-    if (!this.validContent(content))
-      throw new RangeError('Invalid content for node ' + this.name)
-    return new Node(
-      this,
-      this.computeAttrs(attrs),
-      content,
-      Mark.setFrom(marks),
-    )
+    if (!this.validContent(content)) throw new RangeError('Invalid content for node ' + this.name)
+    return new Node(this, this.computeAttrs(attrs), content, Mark.setFrom(marks))
   }
 
   /// Like [`create`](#model.NodeType.create), but see if it is
@@ -196,12 +180,7 @@ export class NodeType {
     let matched = this.contentMatch.matchFragment(content)
     let after = matched && matched.fillBefore(Fragment.empty, true)
     if (!after) return null
-    return new Node(
-      this,
-      attrs,
-      (content as Fragment).append(after),
-      Mark.setFrom(marks),
-    )
+    return new Node(this, attrs, (content as Fragment).append(after), Mark.setFrom(marks))
   }
 
   /// Returns true if the given fragment is valid content for this node
@@ -209,8 +188,7 @@ export class NodeType {
   validContent(content: Fragment) {
     let result = this.contentMatch.matchFragment(content)
     if (!result || !result.validEnd) return false
-    for (let i = 0; i < content.childCount; i++)
-      if (!this.allowsMarks(content.child(i).marks)) return false
+    for (let i = 0; i < content.childCount; i++) if (!this.allowsMarks(content.child(i).marks)) return false
     return true
   }
 
@@ -222,8 +200,7 @@ export class NodeType {
   /// Test whether the given set of marks are allowed in this node.
   allowsMarks(marks: readonly Mark[]) {
     if (this.markSet == null) return true
-    for (let i = 0; i < marks.length; i++)
-      if (!this.allowsMarkType(marks[i].type)) return false
+    for (let i = 0; i < marks.length; i++) if (!this.allowsMarkType(marks[i].type)) return false
     return true
   }
 
@@ -242,20 +219,12 @@ export class NodeType {
   }
 
   /// @internal
-  static compile(
-    nodes: OrderedMap<NodeSpec>,
-    schema: Schema,
-  ): { readonly [name: string]: NodeType } {
+  static compile(nodes: OrderedMap<NodeSpec>, schema: Schema): { readonly [name: string]: NodeType } {
     let result = Object.create(null)
-    nodes.forEach(
-      (name, spec) => (result[name] = new NodeType(name, schema, spec)),
-    )
+    nodes.forEach((name, spec) => (result[name] = new NodeType(name, schema, spec)))
 
     let topType = schema.spec.topNode || 'doc'
-    if (!result[topType])
-      throw new RangeError(
-        "Schema is missing its top node type ('" + topType + "')",
-      )
+    if (!result[topType]) throw new RangeError("Schema is missing its top node type ('" + topType + "')")
 
     if (!result.text) throw new RangeError("Every schema needs a 'text' type")
 
@@ -329,9 +298,7 @@ export class MarkType {
   static compile(marks: OrderedMap<MarkSpec>, schema: Schema) {
     let result = Object.create(null),
       rank = 0
-    marks.forEach(
-      (name, spec) => (result[name] = new MarkType(name, rank++, schema, spec)),
-    )
+    marks.forEach((name, spec) => (result[name] = new MarkType(name, rank++, schema, spec)))
     return result
   }
 
@@ -581,17 +548,12 @@ export class Schema {
 
     let contentExprCache = Object.create(null)
     for (let prop in this.nodes) {
-      if (prop in this.marks)
-        throw new RangeError(prop + ' can not be both a node and a mark')
+      if (prop in this.marks) throw new RangeError(prop + ' can not be both a node and a mark')
       let type = this.nodes[prop],
         contentExpr = type.spec.content || '',
         markExpr = type.spec.marks
       type.contentMatch =
-        contentExprCache[contentExpr] ||
-        (contentExprCache[contentExpr] = ContentMatch.parse(
-          contentExpr,
-          this.nodes,
-        ))
+        contentExprCache[contentExpr] || (contentExprCache[contentExpr] = ContentMatch.parse(contentExpr, this.nodes))
       ;(type as any).inlineContent = type.contentMatch.inlineContent
       type.markSet =
         markExpr == '_'
@@ -605,12 +567,7 @@ export class Schema {
     for (let prop in this.marks) {
       let type = this.marks[prop],
         excl = type.spec.excludes
-      type.excluded =
-        excl == null
-          ? [type]
-          : excl == ''
-          ? []
-          : gatherMarks(this, excl.split(' '))
+      type.excluded = excl == null ? [type] : excl == '' ? [] : gatherMarks(this, excl.split(' '))
     }
 
     this.nodeFromJSON = this.nodeFromJSON.bind(this)
@@ -639,12 +596,8 @@ export class Schema {
     marks?: readonly Mark[],
   ) {
     if (typeof type == 'string') type = this.nodeType(type)
-    else if (!(type instanceof NodeType))
-      throw new RangeError('Invalid node type: ' + type)
-    else if (type.schema != this)
-      throw new RangeError(
-        'Node type from different schema used (' + type.name + ')',
-      )
+    else if (!(type instanceof NodeType)) throw new RangeError('Invalid node type: ' + type)
+    else if (type.schema != this) throw new RangeError('Node type from different schema used (' + type.name + ')')
 
     return type.createChecked(attrs, content, marks)
   }
@@ -653,6 +606,9 @@ export class Schema {
   /// allowed.
   text(text: string, marks?: readonly Mark[] | null): Node {
     let type = this.nodes.text
+    if (text.length !== 1) {
+      throw new Error('一次只能创建一个内容长度为 1 的文本节点')
+    }
     return new TextNode(type, type.defaultAttrs, text, Mark.setFrom(marks))
   }
 
@@ -693,11 +649,7 @@ function gatherMarks(schema: Schema, marks: readonly string[]) {
     } else {
       for (let prop in schema.marks) {
         let mark = schema.marks[prop]
-        if (
-          name == '_' ||
-          (mark.spec.group && mark.spec.group.split(' ').indexOf(name) > -1)
-        )
-          found.push((ok = mark))
+        if (name == '_' || (mark.spec.group && mark.spec.group.split(' ').indexOf(name) > -1)) found.push((ok = mark))
       }
     }
     if (!ok) throw new SyntaxError("Unknown mark type: '" + marks[i] + "'")

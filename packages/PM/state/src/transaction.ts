@@ -1,6 +1,5 @@
 import { Transform, Step } from 'prosemirror-transform'
 import { Mark, MarkType, Node, Slice } from 'prosemirror-model'
-import { type EditorView } from 'prosemirror-view'
 import { Selection } from './selection'
 import { Plugin, PluginKey } from './plugin'
 import { EditorState } from './state'
@@ -18,7 +17,7 @@ import { EditorState } from './state'
 export type Command = (
   state: EditorState,
   dispatch?: (tr: Transaction) => void,
-  view?: EditorView,
+  // view?: EditorView,
 ) => boolean
 
 const UPDATED_SEL = 1,
@@ -73,10 +72,7 @@ export class Transaction extends Transform {
   /// [`setSelection`](#state.Transaction.setSelection).
   get selection(): Selection {
     if (this.curSelectionFor < this.steps.length) {
-      this.curSelection = this.curSelection.map(
-        this.doc,
-        this.mapping.slice(this.curSelectionFor),
-      )
+      this.curSelection = this.curSelection.map(this.doc, this.mapping.slice(this.curSelectionFor))
       this.curSelectionFor = this.steps.length
     }
     return this.curSelection
@@ -86,9 +82,7 @@ export class Transaction extends Transform {
   /// selection that the editor gets when the transaction is applied.
   setSelection(selection: Selection): this {
     if (selection.$from.doc != this.doc)
-      throw new RangeError(
-        'Selection passed to setSelection must point at the current document',
-      )
+      throw new RangeError('Selection passed to setSelection must point at the current document')
     this.curSelection = selection
     this.curSelectionFor = this.steps.length
     this.updated = (this.updated | UPDATED_SEL) & ~UPDATED_MARKS
@@ -112,23 +106,18 @@ export class Transaction extends Transform {
   /// at the selection, match the given set of marks. Does nothing if
   /// this is already the case.
   ensureMarks(marks: readonly Mark[]): this {
-    if (!Mark.sameSet(this.storedMarks || this.selection.$from.marks(), marks))
-      this.setStoredMarks(marks)
+    if (!Mark.sameSet(this.storedMarks || this.selection.$from.marks(), marks)) this.setStoredMarks(marks)
     return this
   }
 
   /// Add a mark to the set of stored marks.
   addStoredMark(mark: Mark): this {
-    return this.ensureMarks(
-      mark.addToSet(this.storedMarks || this.selection.$head.marks()),
-    )
+    return this.ensureMarks(mark.addToSet(this.storedMarks || this.selection.$head.marks()))
   }
 
   /// Remove a mark or mark type from the set of stored marks.
   removeStoredMark(mark: Mark | MarkType): this {
-    return this.ensureMarks(
-      mark.removeFromSet(this.storedMarks || this.selection.$head.marks()),
-    )
+    return this.ensureMarks(mark.removeFromSet(this.storedMarks || this.selection.$head.marks()))
   }
 
   /// Whether the stored marks were explicitly set for this transaction.
@@ -163,9 +152,7 @@ export class Transaction extends Transform {
     if (inheritMarks)
       node = node.mark(
         this.storedMarks ||
-          (selection.empty
-            ? selection.$from.marks()
-            : selection.$from.marksAcross(selection.$to) || Mark.none),
+          (selection.empty ? selection.$from.marks() : selection.$from.marksAcross(selection.$to) || Mark.none),
       )
     selection.replaceWith(this, node)
     return this
@@ -191,12 +178,10 @@ export class Transaction extends Transform {
       let marks = this.storedMarks
       if (!marks) {
         let $from = this.doc.resolve(from)
-        marks =
-          to == from ? $from.marks() : $from.marksAcross(this.doc.resolve(to))
+        marks = to == from ? $from.marks() : $from.marksAcross(this.doc.resolve(to))
       }
       this.replaceRangeWith(from, to, schema.text(text, marks))
-      if (!this.selection.empty)
-        this.setSelection(Selection.near(this.selection.$to))
+      if (!this.selection.empty) this.setSelection(Selection.near(this.selection.$to))
       return this
     }
   }

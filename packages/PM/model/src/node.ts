@@ -84,12 +84,7 @@ export class Node {
   nodesBetween(
     from: number,
     to: number,
-    f: (
-      node: Node,
-      pos: number,
-      parent: Node | null,
-      index: number,
-    ) => void | boolean,
+    f: (node: Node, pos: number, parent: Node | null, index: number) => void | boolean,
     startPos = 0,
   ) {
     this.content.nodesBetween(from, to, f, startPos, this)
@@ -97,14 +92,7 @@ export class Node {
 
   /// Call the given callback for every descendant node. Doesn't
   /// descend into a node when the callback returns `false`.
-  descendants(
-    f: (
-      node: Node,
-      pos: number,
-      parent: Node | null,
-      index: number,
-    ) => void | boolean,
-  ) {
+  descendants(f: (node: Node, pos: number, parent: Node | null, index: number) => void | boolean) {
     this.nodesBetween(0, this.content.size, f)
   }
 
@@ -141,10 +129,7 @@ export class Node {
 
   /// Test whether two nodes represent the same piece of document.
   eq(other: Node) {
-    return (
-      this == other ||
-      (this.sameMarkup(other) && this.content.eq(other.content))
-    )
+    return this == other || (this.sameMarkup(other) && this.content.eq(other.content))
   }
 
   /// Compare the markup (type, attributes, and marks) of this node to
@@ -155,11 +140,7 @@ export class Node {
 
   /// Check whether this node's markup correspond to the given type,
   /// attributes, and marks.
-  hasMarkup(
-    type: NodeType,
-    attrs?: Attrs | null,
-    marks?: readonly Mark[],
-  ): boolean {
+  hasMarkup(type: NodeType, attrs?: Attrs | null, marks?: readonly Mark[]): boolean {
     return (
       this.type == type &&
       compareDeep(this.attrs, attrs || type.defaultAttrs || emptyAttrs) &&
@@ -177,9 +158,7 @@ export class Node {
   /// Create a copy of this node, with the given set of marks instead
   /// of the node's own marks.
   mark(marks: readonly Mark[]): Node {
-    return marks == this.marks
-      ? this
-      : new Node(this.type, this.attrs, this.content, marks)
+    return marks == this.marks ? this : new Node(this.type, this.attrs, this.content, marks)
   }
 
   /// Create a copy of this node with only the content between the
@@ -328,8 +307,7 @@ export class Node {
   /// Get the content match in this node at the given index.
   contentMatchAt(index: number) {
     let match = this.type.contentMatch.matchFragment(this.content, 0, index)
-    if (!match)
-      throw new Error('Called contentMatchAt on a node with invalid content')
+    if (!match) throw new Error('Called contentMatchAt on a node with invalid content')
     return match
   }
 
@@ -338,29 +316,17 @@ export class Node {
   /// to the empty fragment) would leave the node's content valid. You
   /// can optionally pass `start` and `end` indices into the
   /// replacement fragment.
-  canReplace(
-    from: number,
-    to: number,
-    replacement = Fragment.empty,
-    start = 0,
-    end = replacement.childCount,
-  ) {
+  canReplace(from: number, to: number, replacement = Fragment.empty, start = 0, end = replacement.childCount) {
     let one = this.contentMatchAt(from).matchFragment(replacement, start, end)
     let two = one && one.matchFragment(this.content, to)
     if (!two || !two.validEnd) return false
-    for (let i = start; i < end; i++)
-      if (!this.type.allowsMarks(replacement.child(i).marks)) return false
+    for (let i = start; i < end; i++) if (!this.type.allowsMarks(replacement.child(i).marks)) return false
     return true
   }
 
   /// Test whether replacing the range `from` to `to` (by index) with
   /// a node of the given type would leave the node's content valid.
-  canReplaceWith(
-    from: number,
-    to: number,
-    type: NodeType,
-    marks?: readonly Mark[],
-  ) {
+  canReplaceWith(from: number, to: number, type: NodeType, marks?: readonly Mark[]) {
     if (marks && !this.type.allowsMarks(marks)) return false
     let start = this.contentMatchAt(from).matchType(type)
     let end = start && start.matchFragment(this.content, to)
@@ -372,8 +338,7 @@ export class Node {
   /// is at least one node type that can appear in both nodes (to avoid
   /// merging completely incompatible nodes).
   canAppend(other: Node) {
-    if (other.content.size)
-      return this.canReplace(this.childCount, this.childCount, other.content)
+    if (other.content.size) return this.canReplace(this.childCount, this.childCount, other.content)
     else return this.type.compatibleContent(other.type)
   }
 
@@ -381,19 +346,12 @@ export class Node {
   /// schema, and raise error when they do not.
   check() {
     if (!this.type.validContent(this.content))
-      throw new RangeError(
-        `Invalid content for node ${this.type.name}: ${this.content
-          .toString()
-          .slice(0, 50)}`,
-      )
+      throw new RangeError(`Invalid content for node ${this.type.name}: ${this.content.toString().slice(0, 50)}`)
     let copy = Mark.none
-    for (let i = 0; i < this.marks.length; i++)
-      copy = this.marks[i].addToSet(copy)
+    for (let i = 0; i < this.marks.length; i++) copy = this.marks[i].addToSet(copy)
     if (!Mark.sameSet(copy, this.marks))
       throw new RangeError(
-        `Invalid collection of marks for node ${
-          this.type.name
-        }: ${this.marks.map((m) => m.type.name)}`,
+        `Invalid collection of marks for node ${this.type.name}: ${this.marks.map((m) => m.type.name)}`,
       )
     this.content.forEach((node) => node.check())
   }
@@ -415,13 +373,16 @@ export class Node {
     if (!json) throw new RangeError('Invalid input for Node.fromJSON')
     let marks = null
     if (json.marks) {
-      if (!Array.isArray(json.marks))
-        throw new RangeError('Invalid mark data for Node.fromJSON')
+      if (!Array.isArray(json.marks)) throw new RangeError('Invalid mark data for Node.fromJSON')
       marks = json.marks.map(schema.markFromJSON)
     }
     if (json.type == 'text') {
-      if (typeof json.text != 'string')
+      if (typeof json.text != 'string') {
         throw new RangeError('Invalid text node in JSON')
+      }
+      if (json.text) {
+        throw new Error('文本json节点的text长度不应大于1')
+      }
       return schema.text(json.text, marks)
     }
     let content = Fragment.fromJSON(schema, json.content)
@@ -435,14 +396,12 @@ export class TextNode extends Node {
   readonly text: string
 
   /// @internal
-  constructor(
-    type: NodeType,
-    attrs: Attrs,
-    content: string,
-    marks?: readonly Mark[],
-  ) {
+  constructor(type: NodeType, attrs: Attrs, content: string, marks?: readonly Mark[]) {
     super(type, attrs, null, marks)
     if (!content) throw new RangeError('Empty text nodes are not allowed')
+    if (content.length !== 1) {
+      throw new Error('文本节点的长度必须为 1')
+    }
     this.text = content
   }
 
@@ -464,9 +423,7 @@ export class TextNode extends Node {
   }
 
   mark(marks: readonly Mark[]) {
-    return marks == this.marks
-      ? this
-      : new TextNode(this.type, this.attrs, this.text, marks)
+    return marks == this.marks ? this : new TextNode(this.type, this.attrs, this.text, marks)
   }
 
   withText(text: string) {
@@ -491,7 +448,6 @@ export class TextNode extends Node {
 }
 
 function wrapMarks(marks: readonly Mark[], str: string) {
-  for (let i = marks.length - 1; i >= 0; i--)
-    str = marks[i].type.name + '(' + str + ')'
+  for (let i = marks.length - 1; i >= 0; i--) str = marks[i].type.name + '(' + str + ')'
   return str
 }
