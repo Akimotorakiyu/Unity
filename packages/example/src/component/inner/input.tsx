@@ -18,7 +18,9 @@ export const InputComponent = defineFunctionComponent((props: { rect: DOMRect })
   virtualPen.event.on('input', (virtualInputEventInfo) => {
     console.log('virtualInputEventInfo', virtualInputEventInfo)
 
-    editorManager.editor.editorMethods.intsertText(virtualInputEventInfo.data || '')
+    if (virtualInputEventInfo.status === 'normal' || virtualInputEventInfo.status === 'end') {
+      editorManager.editor.editorMethods.intsertText(virtualInputEventInfo.data || '')
+    }
   })
 
   onUpdated(() => {
@@ -30,11 +32,10 @@ export const InputComponent = defineFunctionComponent((props: { rect: DOMRect })
       return (
         <input
           ref={inputRef}
-          class={`absolute`}
+          class={`absolute opacity-0 pointer-events-none w-[2px]`}
           style={{
             transform: `translateX(${props.rect.x}px)translateY(${props.rect.y}px)`,
             height: `${props.rect.height}px`,
-            width: `0`,
           }}
         ></input>
       )
